@@ -5,7 +5,7 @@
         "port": 3306,
         "user": "root",
         "password": "password",
-        "database": "kickstart_user",
+        "database": "askwheels_updated",
         "connectionLimit": 10,
         "waitForConnections": true,
         "dateStrings": true,

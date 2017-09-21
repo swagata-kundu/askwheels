@@ -35,7 +35,7 @@ var _user_role = {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.createPublicUser = function(req, callback) {
+user.createPublicUser = function (req, callback) {
     var rules = {
         firstName: Check.that(req.body.firstName).isNotEmptyOrBlank().isLengthInRange(1, 50),
         lastName: Check.that(req.body.lastName).isNotEmptyOrBlank().isLengthInRange(1, 50),
@@ -43,13 +43,13 @@ user.createPublicUser = function(req, callback) {
         password: Check.that(req.body.password).isNotEmptyOrBlank().isLengthInRange(4, 20),
         contactNo: Check.that(req.body.contactNo).isOptional().isNotEmptyOrBlank().isLengthInRange(10, 20)
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         } else {
             var insertData = sanitizeDataForUserTable(req.body);
             var sessionId = insertData.sessionId;
-            insertUserData(insertData, _user_role.public, function(err, userIdCreated) {
+            insertUserData(insertData, _user_role.public, function (err, userIdCreated) {
                 if (err) {
                     return callback(err);
                 }
@@ -76,7 +76,7 @@ user.createPublicUser = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.changePassword = function(req, callback) {
+user.changePassword = function (req, callback) {
 
     if (!req.body.userId) {
         changeUsersOwnPassword(req, callback);
@@ -95,7 +95,7 @@ user.changePassword = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.editProfile = function(req, callback) {
+user.editProfile = function (req, callback) {
 
     if (!req.body.userId) {
         updateUserOwnProfile(req.body, req.auth.id, callback);
@@ -114,7 +114,7 @@ user.editProfile = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.uploadProfilePic = function(req, callback) {
+user.uploadProfilePic = function (req, callback) {
     var rules = {
         userId: Check.that(req.auth.id).isMYSQLId(),
         file: Check.that(req.file).isObjectType()
@@ -125,16 +125,16 @@ user.uploadProfilePic = function(req, callback) {
         'folderName': 'profilepic',
         'bucketName': 'devnightout1'
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
-        awsHelper.uploadSingle(req.file, bucketDetail).then(function(url) {
+        awsHelper.uploadSingle(req.file, bucketDetail).then(function (url) {
             var updateObject = {
                 'imgUrl': url
             };
             updateUserOwnProfile(updateObject, userId, callback);
-        }, function(error) {
+        }, function (error) {
             return callback(error);
 
         });
@@ -147,19 +147,19 @@ user.uploadProfilePic = function(req, callback) {
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-user.blockUser = function(req, callback) {
+user.blockUser = function (req, callback) {
     var rules = {
         userId: Check.that(req.body.userId).isMYSQLId(),
         flag: Check.that(req.body.flag).isBooleanType()
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
         var SQL = 'CALL ?? (?,?)';
         var inserts = [dbNames.sp.blockUser, req.body.userId, req.body.flag];
         SQL = mysql.format(SQL, inserts);
-        dbHelper.executeQuery(SQL, function(err, result) {
+        dbHelper.executeQuery(SQL, function (err, result) {
             if (err) {
                 return callback(err);
             }
@@ -180,7 +180,7 @@ user.blockUser = function(req, callback) {
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-user.createJuniorAdmin = function(req, callback) {
+user.createJuniorAdmin = function (req, callback) {
     var rules = {
         firstName: Check.that(req.body.firstName).isNotEmptyOrBlank().isLengthInRange(1, 50),
         lastName: Check.that(req.body.lastName).isNotEmptyOrBlank().isLengthInRange(1, 50),
@@ -190,16 +190,16 @@ user.createJuniorAdmin = function(req, callback) {
         contactNo: Check.that(req.body.contactNo).isOptional().isNotEmptyOrBlank().isLengthInRange(10, 20)
     };
     async.waterfall([
-        function(cb) {
-            appUtils.validateChecks(rules, function(err) {
+        function (cb) {
+            appUtils.validateChecks(rules, function (err) {
                 return cb(err);
             });
         },
-        function(cb) {
+        function (cb) {
             var insertData = sanitizeDataForUserTable(req.body);
             insertUserData(insertData, _user_role.juniorAdmin, cb);
         }
-    ], function(err) {
+    ], function (err) {
         if (err)
             return callback(err);
 
@@ -218,18 +218,18 @@ user.createJuniorAdmin = function(req, callback) {
  * Remove redundent data in case of failed sign up
  * @param {int} - userId (newly created userId)
  */
-user.failedSignUp = function(userId) {
+user.failedSignUp = function (userId) {
     if (userId) {
         var SQL = 'CALL ?? (?)';
         var inserts = [dbNames.sp.failedSignUp, userId];
         SQL = mysql.format(SQL, inserts);
-        dbHelper.executeQuery(SQL, function() {});
+        dbHelper.executeQuery(SQL, function () { });
     }
 };
 
 
 
-var addUserRole = function(userId, roleId, callback) {
+var addUserRole = function (userId, roleId, callback) {
     var stringQuery = 'INSERT INTO db_user_in_roles SET ?';
     var insertData = {
         'roleId': roleId,
@@ -247,8 +247,8 @@ var addUserRole = function(userId, roleId, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-var insertUserData = function(insertData, roleId, callback) {
-    checkDuplicateRegistratrtion(insertData.email, insertData.userName, function(err, status) {
+var insertUserData = function (insertData, roleId, callback) {
+    checkDuplicateRegistratrtion(insertData.email, function (err, status) {
         if (err) {
             return callback(err);
         }
@@ -258,12 +258,12 @@ var insertUserData = function(insertData, roleId, callback) {
         }
         var stringQuery = 'INSERT INTO db_users SET ? ';
         stringQuery = mysql.format(stringQuery, insertData);
-        dbHelper.executeQuery(stringQuery, function(err, result) {
+        dbHelper.executeQuery(stringQuery, function (err, result) {
             if (err) {
                 return callback(err);
             }
             var userId = result.insertId;
-            addUserRole(result.insertId, roleId, function(err) {
+            addUserRole(result.insertId, roleId, function (err) {
                 if (err) {
                     return callback(err);
                 }
@@ -278,7 +278,7 @@ var insertUserData = function(insertData, roleId, callback) {
  * Create insert object according to table column name from request body
  * @param {object} data 
  */
-var sanitizeDataForUserTable = function(data) {
+var sanitizeDataForUserTable = function (data) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
     insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
@@ -287,11 +287,9 @@ var sanitizeDataForUserTable = function(data) {
         insertObject['phone'] = data.contactNo.trim();
     }
     insertObject['password'] = md5(data.password.trim());
-    if (data.deviceType && data.deviceId) {
-        insertObject['deviceType'] = data.deviceType;
+    if (data.deviceId) {
         insertObject['deviceId'] = data.deviceId;
     }
-    insertObject['userName'] = data.userName ? data.userName.trim() : data.email.trim();
     insertObject['sessionId'] = uuid.v4();
     insertObject['isLive'] = true;
     return insertObject;
@@ -303,11 +301,11 @@ var sanitizeDataForUserTable = function(data) {
  * @param {string} emailId 
  * @param {function(Error,object)} callback - callback function
  */
-var checkDuplicateRegistratrtion = function(emailId, userName, callback) {
-    var sql = 'CALL ?? ( ?,?);';
-    var object = [dbNames.sp.checkDuplicateRegistration, emailId, userName];
+var checkDuplicateRegistratrtion = function (emailId, callback) {
+    var sql = 'CALL ?? ( ?);';
+    var object = [dbNames.sp.checkDuplicateRegistration, emailId];
     sql = mysql.format(sql, object);
-    dbHelper.executeQuery(sql, function(err, result) {
+    dbHelper.executeQuery(sql, function (err, result) {
         if (err) {
             return callback(err);
         }
@@ -326,13 +324,13 @@ var checkDuplicateRegistratrtion = function(emailId, userName, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-var changeUsersOwnPassword = function(req, callback) {
+var changeUsersOwnPassword = function (req, callback) {
     var userId = req.auth.id;
     var rules = {
         newPassword: Check.that(req.body.newPassword).isNotEmptyOrBlank().isLengthInRange(4, 20),
         oldPassword: Check.that(req.body.oldPassword).isNotEmptyOrBlank().isLengthInRange(4, 20)
     };
-    appUtils.validateChecks(rules, function(err, result) {
+    appUtils.validateChecks(rules, function (err, result) {
         if (err) {
             return callback(err);
         }
@@ -342,7 +340,7 @@ var changeUsersOwnPassword = function(req, callback) {
         var inserts = ['db_users', 'password', newPassword, 'id', userId, 'password', oldPassword];
         sqlQuery = mysql.format(sqlQuery, inserts);
 
-        dbHelper.executeQueryPromise(sqlQuery).then(function(result) {
+        dbHelper.executeQueryPromise(sqlQuery).then(function (result) {
             if (result.affectedRows == 1) {
                 var response = new responseModel.objectResponse();
                 response.message = responseMessage.CHANGE_PASSWORD;
@@ -350,7 +348,7 @@ var changeUsersOwnPassword = function(req, callback) {
             }
             return callback(ApiException.newNotAllowedError(api_errors.wrong_oldpassword.error_code, null)
                 .addDetails(api_errors.wrong_oldpassword.description));
-        }, function(error) {
+        }, function (error) {
             return callback(error);
         });
     });
@@ -362,7 +360,7 @@ var changeUsersOwnPassword = function(req, callback) {
  * @param userId(int)- used for changing profile 
  * @param {function(Error,object)} callback - callback function.
  */
-var updateUserOwnProfile = function(data, userId, callback) {
+var updateUserOwnProfile = function (data, userId, callback) {
     var insertObject = {};
     if (data.firstName) {
         insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
@@ -379,8 +377,8 @@ var updateUserOwnProfile = function(data, userId, callback) {
     }
 
 
-    if (data.email || data.userName) {
-        checkDuplicateRegistratrtion(data.email ? data.email : '', data.userName ? data.userName : '', function(err, status) {
+    if (data.email) {
+        checkDuplicateRegistratrtion(data.email, function (err, status) {
             if (err) {
                 return callback(err);
             }
@@ -401,12 +399,12 @@ var updateUserOwnProfile = function(data, userId, callback) {
     }
 };
 
-var updateData = function(insertObject, userId, callback) {
+var updateData = function (insertObject, userId, callback) {
     if (!lodash.isEmpty(insertObject)) {
         var stringQuery = 'UPDATE ?? SET ? WHERE ??=? AND ??=?';
         var inserts = ['db_users', insertObject, 'id', userId, 'isDeleted', false];
         stringQuery = mysql.format(stringQuery, inserts);
-        dbHelper.executeQueryPromise(stringQuery).then(function(result) {
+        dbHelper.executeQueryPromise(stringQuery).then(function (result) {
             if (result.affectedRows == 1) {
                 var response = new responseModel.objectResponse();
                 response.message = responseMessage.PROFILE_UPDATED;
@@ -416,7 +414,7 @@ var updateData = function(insertObject, userId, callback) {
                 return callback(null, response);
             }
             return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
-        }, function(error) {
+        }, function (error) {
             return callback(error);
         });
     } else {
@@ -429,7 +427,7 @@ var updateData = function(insertObject, userId, callback) {
  * For sending response if user successfully logged in.
  * @param {Object}  - userDetail(object).
  */
-var responseForSuccessfulSignUp = function(userDetail, userId, roleId) {
+var responseForSuccessfulSignUp = function (userDetail, userId, roleId) {
     var response = {
         'firstName': userDetail.firstName,
         'lastName': userDetail.lastName,
@@ -450,12 +448,12 @@ var responseForSuccessfulSignUp = function(userDetail, userId, roleId) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-var changeOtherUserPassword = function(req, callback) {
+var changeOtherUserPassword = function (req, callback) {
     var rules = {
         newPassword: Check.that(req.body.newPassword).isNotEmptyOrBlank().isLengthInRange(4, 20),
         userId: Check.that(req.body.userId).isInteger()
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
@@ -464,7 +462,7 @@ var changeOtherUserPassword = function(req, callback) {
         var inserts = ['db_users', 'password', newPassword, 'id', req.body.userId, 'isDeleted', false];
         sqlQuery = mysql.format(sqlQuery, inserts);
 
-        dbHelper.executeQueryPromise(sqlQuery).then(function(result) {
+        dbHelper.executeQueryPromise(sqlQuery).then(function (result) {
             if (result.affectedRows == 1) {
                 var response = new responseModel.objectResponse();
                 response.message = responseMessage.CHANGE_PASSWORD;
@@ -472,7 +470,7 @@ var changeOtherUserPassword = function(req, callback) {
             }
             return callback(ApiException.newNotAllowedError(api_errors.wrong_oldpassword.error_code, null)
                 .addDetails(api_errors.wrong_oldpassword.description));
-        }, function(error) {
+        }, function (error) {
             return callback(error);
         });
     });
