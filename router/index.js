@@ -3,7 +3,8 @@ var controllerIndex = require('../controller');
 var secureRouter = require('./secureRouter');
 var authUtil = require('../libs/authUtils');
 
-module.exports = function(app) {
+module.exports = function (app) {
+    app.use('/secure', secureRouter);
     app.post('/signup/businessowner', controllerIndex.auth.signUpBusinessOwner);
     app.post('/signup', controllerIndex.auth.signUp);
     app.post('/login', controllerIndex.auth.login);

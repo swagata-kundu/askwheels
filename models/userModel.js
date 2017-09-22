@@ -21,12 +21,10 @@ var user = {};
 module.exports = user;
 
 var _user_role = {
-    'public': 1,
-    'businessOwner': 2,
-    'licensee': 3,
-    'salesPerson': 4,
-    'juniorAdmin': 5,
-    'admin': 6
+    'Seller': 1,
+    'Sub Seller': 2,
+    'Uploader': 3,
+    'Admin': 4
 };
 
 /**
@@ -80,7 +78,7 @@ user.changePassword = function (req, callback) {
 
     if (!req.body.userId) {
         changeUsersOwnPassword(req, callback);
-    } else if (req.body.userId && req.auth.roleId > 2) {
+    } else if (req.body.userId && req.auth.roleId === 4) {
         changeOtherUserPassword(req, callback);
     } else {
         return callback(ApiException.newBadRequestError(null));
@@ -99,7 +97,7 @@ user.editProfile = function (req, callback) {
 
     if (!req.body.userId) {
         updateUserOwnProfile(req.body, req.auth.id, callback);
-    } else if (req.body.userId && req.auth.roleId > 2) {
+    } else if (req.body.userId && req.auth.roleId === 4) {
         var updateUserProfile = require('../models/userModel-admin').updateUserProfile;
         updateUserProfile(req, callback);
     } else {
@@ -223,7 +221,7 @@ user.failedSignUp = function (userId) {
         var SQL = 'CALL ?? (?)';
         var inserts = [dbNames.sp.failedSignUp, userId];
         SQL = mysql.format(SQL, inserts);
-        dbHelper.executeQuery(SQL, function () { });
+        dbHelper.executeQuery(SQL, function () {});
     }
 };
 

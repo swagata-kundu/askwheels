@@ -11,7 +11,7 @@
         "dateStrings": true,
         "multipleStatements": true
     },
-    "mailFrom": "info@yourcitynightout.com",
+    "mailFrom": "testermundu@gmail.com",
     "mailCredential": {
         "service": "gmail",
         "auth": {
