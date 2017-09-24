@@ -133,16 +133,8 @@ var responseForSuccessfulLogin = function (userDetail) {
  * @param {function(Error,object)} callback - callback function..
  */
 var checkEmailExistance = function (emailId, callback) {
-    var sql = 'SELECT count(id) as count FROM ?? WHERE (?? = ? OR ??=?) AND ??=?';
-    var inserts = [
-        'db_users',
-        'email',
-        emailId,
-        'userName',
-        emailId,
-        'isDeleted',
-        false
-    ];
+    var sql = 'SELECT count(id) as count FROM ?? WHERE ?? = ?  AND ??=?';
+    var inserts = ['db_users', 'email', emailId, 'isDeleted', false];
     sql = mysql.format(sql, inserts);
     dbHelper.executeQuery(sql, function (err, result) {
         if (err) {
