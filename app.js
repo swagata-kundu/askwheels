@@ -14,7 +14,7 @@ var jsonBodyParser = require('./libs/jsonBodyParser');
 
 
 // init environment
-var allowedEnv = ['development', 'stage', 'm2', 'production'];
+var allowedEnv = ['development', 'staging', 'production'];
 var env = config.util.getEnv('NODE_ENV');
 if (lodash.includes(allowedEnv, env)) {
     console.info('NODE_ENV: %s', env);
