@@ -22,26 +22,6 @@ exports.signUp = function(req, res, next) {
 };
 
 
-/**
- * Business owner signup controller
- * @request_type- POST
- * @url- /signup/businessowner
- * @param {Object} req - express request.
- * @param {Object} res - express response.
- * @param {function} next - next middleware callback.
- */
-
-exports.signUpBusinessOwner = function(req, res, next) {
-    userModel.createBusinessOwner(req, function(err, result, sessionId) {
-        if (err) {
-            return next(err);
-        } else {
-            res.set('sessionId', sessionId).json(result);
-        }
-    });
-};
-
-
 
 /**
  * User login controller
@@ -122,22 +102,3 @@ exports.forgetPassword = function(req, res, next) {
     });
 };
 
-
-/**
- * Check username existance controller
- * @request_type- GET
- * @url- /isemailidexist/:emailId
- * @param {Object} req - express request.
- * @param {Object} res - express response.
- * @param {function} next - next middleware callback.
- */
-
-exports.checkUserName = function(req, res, next) {
-    authModel.checkUserName(req, function(err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
-};

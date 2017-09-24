@@ -14,17 +14,16 @@ var md5 = require('md5');
 var uuid = require('node-uuid');
 var mysql = require('mysql');
 var lodash = require('lodash');
-var async = require('async');
 //define module
 
 var user = {};
 module.exports = user;
 
 var _user_role = {
-    'Seller': 1,
-    'Sub Seller': 2,
-    'Uploader': 3,
-    'Admin': 4
+    'seller': 1,
+    'sub_seller': 2,
+    'uploader': 3,
+    'admin': 4
 };
 
 /**
@@ -35,11 +34,37 @@ var _user_role = {
 
 user.createPublicUser = function (req, callback) {
     var rules = {
-        firstName: Check.that(req.body.firstName).isNotEmptyOrBlank().isLengthInRange(1, 50),
-        lastName: Check.that(req.body.lastName).isNotEmptyOrBlank().isLengthInRange(1, 50),
-        email: Check.that(req.body.email).isNotEmptyOrBlank().isEmail().isLengthInRange(1, 100),
-        password: Check.that(req.body.password).isNotEmptyOrBlank().isLengthInRange(4, 20),
-        contactNo: Check.that(req.body.contactNo).isOptional().isNotEmptyOrBlank().isLengthInRange(10, 20)
+        firstName: Check
+            .that(req.body.firstName)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(1, 50),
+        lastName: Check
+            .that(req.body.lastName)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(1, 50),
+        email: Check
+            .that(req.body.email)
+            .isNotEmptyOrBlank()
+            .isEmail()
+            .isLengthInRange(1, 100),
+        password: Check
+            .that(req.body.password)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(4, 20),
+        contactNo: Check
+            .that(req.body.contactNo)
+            .isOptional()
+            .isNotEmptyOrBlank()
+            .isLengthInRange(10, 20),
+        address: Check
+            .that(req.body.address)
+            .isOptional()
+            .isNotEmptyOrBlank()
+            .isLengthInRange(1, 400),
+        roleId: Check
+            .that(req.body.roleId)
+            .isInteger()
+            .isNumberInRange(1, 3)
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
@@ -47,7 +72,7 @@ user.createPublicUser = function (req, callback) {
         } else {
             var insertData = sanitizeDataForUserTable(req.body);
             var sessionId = insertData.sessionId;
-            insertUserData(insertData, _user_role.public, function (err, userIdCreated) {
+            insertUserData(insertData, req.body.roleId, function (err, userIdCreated) {
                 if (err) {
                     return callback(err);
                 }
@@ -55,7 +80,7 @@ user.createPublicUser = function (req, callback) {
                     mailer.sendMail(api_events.user_signup.event_code, insertData.email, insertData);
                 }
                 var response = new responseModel.objectResponse();
-                response.data = responseForSuccessfulSignUp(insertData, userIdCreated, _user_role.public);
+                response.data = responseForSuccessfulSignUp(insertData, userIdCreated, req.body.roleId);
                 response.message = responseMessage.REGISTRATION_SUCCESSFULL;
                 return callback(null, response, sessionId);
             });
@@ -63,12 +88,10 @@ user.createPublicUser = function (req, callback) {
     });
 };
 
-
-
 /**
  * use for changing existing user password.
  * @param {object} - req (express request object)
- * @param userId(int)- used for changing other user password 
+ * @param userId(int)- used for changing other user password
  * @param oldPassword(string)
  * @param newPassword(string)
  * @param {function(Error,object)} callback - callback function.
@@ -86,9 +109,8 @@ user.changePassword = function (req, callback) {
 
 };
 
-
 /**
- * Use for updating existing user profile 
+ * Use for updating existing user profile
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
@@ -105,17 +127,20 @@ user.editProfile = function (req, callback) {
     }
 };
 
-
 /**
- * Use for uploading profile picture 
+ * Use for uploading profile picture
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
 
 user.uploadProfilePic = function (req, callback) {
     var rules = {
-        userId: Check.that(req.auth.id).isMYSQLId(),
-        file: Check.that(req.file).isObjectType()
+        userId: Check
+            .that(req.auth.id)
+            .isMYSQLId(),
+        file: Check
+            .that(req.file)
+            .isObjectType()
     };
 
     var userId = req.auth.id;
@@ -127,28 +152,33 @@ user.uploadProfilePic = function (req, callback) {
         if (err) {
             return callback(err);
         }
-        awsHelper.uploadSingle(req.file, bucketDetail).then(function (url) {
-            var updateObject = {
-                'imgUrl': url
-            };
-            updateUserOwnProfile(updateObject, userId, callback);
-        }, function (error) {
-            return callback(error);
+        awsHelper
+            .uploadSingle(req.file, bucketDetail)
+            .then(function (url) {
+                var updateObject = {
+                    'imgUrl': url
+                };
+                updateUserOwnProfile(updateObject, userId, callback);
+            }, function (error) {
+                return callback(error);
 
-        });
+            });
     });
 };
 
-
 /**
- * Use for blocking user from login 
+ * Use for blocking user from login
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
 user.blockUser = function (req, callback) {
     var rules = {
-        userId: Check.that(req.body.userId).isMYSQLId(),
-        flag: Check.that(req.body.flag).isBooleanType()
+        userId: Check
+            .that(req.body.userId)
+            .isMYSQLId(),
+        flag: Check
+            .that(req.body.flag)
+            .isBooleanType()
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
@@ -163,54 +193,15 @@ user.blockUser = function (req, callback) {
             }
             if (result.affectedRows == 1) {
                 var resopnse = new responseModel.objectResponse();
-                resopnse.message = req.body.flag ? responseMessage.USER_BLOCKED : responseMessage.USER_UNBLOCKED;
+                resopnse.message = req.body.flag
+                    ? responseMessage.USER_BLOCKED
+                    : responseMessage.USER_UNBLOCKED;
                 return callback(err, resopnse);
             }
             return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
         });
     });
 };
-
-
-
-/**
- * Used for creating new junior admin.
- * @param {object} - req (express request object)
- * @param {function(Error,object)} callback - callback function.
- */
-user.createJuniorAdmin = function (req, callback) {
-    var rules = {
-        firstName: Check.that(req.body.firstName).isNotEmptyOrBlank().isLengthInRange(1, 50),
-        lastName: Check.that(req.body.lastName).isNotEmptyOrBlank().isLengthInRange(1, 50),
-        email: Check.that(req.body.email).isNotEmptyOrBlank().isEmail().isLengthInRange(1, 100),
-        password: Check.that(req.body.password).isNotEmptyOrBlank().isLengthInRange(4, 20),
-        userName: Check.that(req.body.userName).isNotEmptyOrBlank().isLengthInRange(1, 100),
-        contactNo: Check.that(req.body.contactNo).isOptional().isNotEmptyOrBlank().isLengthInRange(10, 20)
-    };
-    async.waterfall([
-        function (cb) {
-            appUtils.validateChecks(rules, function (err) {
-                return cb(err);
-            });
-        },
-        function (cb) {
-            var insertData = sanitizeDataForUserTable(req.body);
-            insertUserData(insertData, _user_role.juniorAdmin, cb);
-        }
-    ], function (err) {
-        if (err)
-            return callback(err);
-
-        var response = new responseModel.objectResponse();
-        response.message = responseMessage.REGISTRATION_SUCCESSFULL;
-        return callback(null, response);
-    });
-
-};
-
-
-
-
 
 /**
  * Remove redundent data in case of failed sign up
@@ -225,8 +216,6 @@ user.failedSignUp = function (userId) {
     }
 };
 
-
-
 var addUserRole = function (userId, roleId, callback) {
     var stringQuery = 'INSERT INTO db_user_in_roles SET ?';
     var insertData = {
@@ -236,7 +225,6 @@ var addUserRole = function (userId, roleId, callback) {
     stringQuery = mysql.format(stringQuery, insertData);
     dbHelper.executeQuery(stringQuery, callback);
 };
-
 
 /**
  * Used for inserting data in db_user and db_user_roles table.
@@ -251,8 +239,7 @@ var insertUserData = function (insertData, roleId, callback) {
             return callback(err);
         }
         if (status) {
-            return callback(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null)
-                .addDetails(api_errors.already_registered.description));
+            return callback(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null).addDetails(api_errors.already_registered.description));
         }
         var stringQuery = 'INSERT INTO db_users SET ? ';
         stringQuery = mysql.format(stringQuery, insertData);
@@ -274,29 +261,35 @@ var insertUserData = function (insertData, roleId, callback) {
 
 /**
  * Create insert object according to table column name from request body
- * @param {object} data 
+ * @param {object} data
  */
 var sanitizeDataForUserTable = function (data) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
     insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
-    insertObject['email'] = data.email.trim();
+    insertObject['email'] = data
+        .email
+        .trim();
     if (data.contactNo) {
-        insertObject['phone'] = data.contactNo.trim();
+        insertObject['phone'] = data
+            .contactNo
+            .trim();
     }
     insertObject['password'] = md5(data.password.trim());
     if (data.deviceId) {
         insertObject['deviceId'] = data.deviceId;
     }
     insertObject['sessionId'] = uuid.v4();
-    insertObject['isLive'] = true;
+    insertObject['isLive'] = false;
+    insertObject['address'] = data.address
+        ? data.address
+        : '';
     return insertObject;
 };
 
-
 /**
  * Check existance of email id in db_users table
- * @param {string} emailId 
+ * @param {string} emailId
  * @param {function(Error,object)} callback - callback function
  */
 var checkDuplicateRegistratrtion = function (emailId, callback) {
@@ -325,8 +318,14 @@ var checkDuplicateRegistratrtion = function (emailId, callback) {
 var changeUsersOwnPassword = function (req, callback) {
     var userId = req.auth.id;
     var rules = {
-        newPassword: Check.that(req.body.newPassword).isNotEmptyOrBlank().isLengthInRange(4, 20),
-        oldPassword: Check.that(req.body.oldPassword).isNotEmptyOrBlank().isLengthInRange(4, 20)
+        newPassword: Check
+            .that(req.body.newPassword)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(4, 20),
+        oldPassword: Check
+            .that(req.body.oldPassword)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(4, 20)
     };
     appUtils.validateChecks(rules, function (err, result) {
         if (err) {
@@ -335,27 +334,36 @@ var changeUsersOwnPassword = function (req, callback) {
         var oldPassword = md5(req.body.oldPassword);
         var newPassword = md5(req.body.newPassword);
         var sqlQuery = 'UPDATE ?? SET  ?? = ?  WHERE ??=? AND ??=?';
-        var inserts = ['db_users', 'password', newPassword, 'id', userId, 'password', oldPassword];
+        var inserts = [
+            'db_users',
+            'password',
+            newPassword,
+            'id',
+            userId,
+            'password',
+            oldPassword
+        ];
         sqlQuery = mysql.format(sqlQuery, inserts);
 
-        dbHelper.executeQueryPromise(sqlQuery).then(function (result) {
-            if (result.affectedRows == 1) {
-                var response = new responseModel.objectResponse();
-                response.message = responseMessage.CHANGE_PASSWORD;
-                return callback(null, response);
-            }
-            return callback(ApiException.newNotAllowedError(api_errors.wrong_oldpassword.error_code, null)
-                .addDetails(api_errors.wrong_oldpassword.description));
-        }, function (error) {
-            return callback(error);
-        });
+        dbHelper
+            .executeQueryPromise(sqlQuery)
+            .then(function (result) {
+                if (result.affectedRows == 1) {
+                    var response = new responseModel.objectResponse();
+                    response.message = responseMessage.CHANGE_PASSWORD;
+                    return callback(null, response);
+                }
+                return callback(ApiException.newNotAllowedError(api_errors.wrong_oldpassword.error_code, null).addDetails(api_errors.wrong_oldpassword.description));
+            }, function (error) {
+                return callback(error);
+            });
     });
 };
 
 /**
  * Use for updating user's own profile.
  * @param data{object} -
- * @param userId(int)- used for changing profile 
+ * @param userId(int)- used for changing profile
  * @param {function(Error,object)} callback - callback function.
  */
 var updateUserOwnProfile = function (data, userId, callback) {
@@ -368,12 +376,21 @@ var updateUserOwnProfile = function (data, userId, callback) {
 
     }
     if (data.contactNo) {
-        insertObject['phone'] = data.contactNo.trim();
+        insertObject['phone'] = data
+            .contactNo
+            .trim();
     }
     if (data.imgUrl) {
-        insertObject['imgUrl'] = data.imgUrl.trim();
+        insertObject['imgUrl'] = data
+            .imgUrl
+            .trim();
     }
+    if (data.address) {
+        insertObject['address'] = data
+            .address
+            .trim();
 
+    }
 
     if (data.email) {
         checkDuplicateRegistratrtion(data.email, function (err, status) {
@@ -381,8 +398,7 @@ var updateUserOwnProfile = function (data, userId, callback) {
                 return callback(err);
             }
             if (status) {
-                return callback(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null)
-                    .addDetails(api_errors.already_registered.description));
+                return callback(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null).addDetails(api_errors.already_registered.description));
             }
             if (data.email) {
                 insertObject['email'] = data.email;
@@ -400,26 +416,34 @@ var updateUserOwnProfile = function (data, userId, callback) {
 var updateData = function (insertObject, userId, callback) {
     if (!lodash.isEmpty(insertObject)) {
         var stringQuery = 'UPDATE ?? SET ? WHERE ??=? AND ??=?';
-        var inserts = ['db_users', insertObject, 'id', userId, 'isDeleted', false];
+        var inserts = [
+            'db_users',
+            insertObject,
+            'id',
+            userId,
+            'isDeleted',
+            false
+        ];
         stringQuery = mysql.format(stringQuery, inserts);
-        dbHelper.executeQueryPromise(stringQuery).then(function (result) {
-            if (result.affectedRows == 1) {
-                var response = new responseModel.objectResponse();
-                response.message = responseMessage.PROFILE_UPDATED;
-                if (insertObject.imgUrl) {
-                    response.data['imgUrl'] = insertObject.imgUrl;
+        dbHelper
+            .executeQueryPromise(stringQuery)
+            .then(function (result) {
+                if (result.affectedRows == 1) {
+                    var response = new responseModel.objectResponse();
+                    response.message = responseMessage.PROFILE_UPDATED;
+                    if (insertObject.imgUrl) {
+                        response.data['imgUrl'] = insertObject.imgUrl;
+                    }
+                    return callback(null, response);
                 }
-                return callback(null, response);
-            }
-            return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
-        }, function (error) {
-            return callback(error);
-        });
+                return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
+            }, function (error) {
+                return callback(error);
+            });
     } else {
         return callback(ApiException.newBadRequestError(null));
     }
 };
-
 
 /**
  * For sending response if user successfully logged in.
@@ -432,7 +456,9 @@ var responseForSuccessfulSignUp = function (userDetail, userId, roleId) {
         'email': userDetail.email,
         'contactNo': userDetail.phone,
         'userId': userId,
-        'imgUrl': userDetail.imgUrl ? userDetail.imgUrl : '',
+        'imgUrl': userDetail.imgUrl
+            ? userDetail.imgUrl
+            : '',
         'roleId': roleId
     };
     return response;
@@ -441,15 +467,20 @@ var responseForSuccessfulSignUp = function (userDetail, userId, roleId) {
 /**
  * Use for changing other users password.
  * @param {object} - req (express request object)
- * @param userId(int)- used for changing other user password 
+ * @param userId(int)- used for changing other user password
  * @param newPassword(string)
  * @param {function(Error,object)} callback - callback function.
  */
 
 var changeOtherUserPassword = function (req, callback) {
     var rules = {
-        newPassword: Check.that(req.body.newPassword).isNotEmptyOrBlank().isLengthInRange(4, 20),
-        userId: Check.that(req.body.userId).isInteger()
+        newPassword: Check
+            .that(req.body.newPassword)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(4, 20),
+        userId: Check
+            .that(req.body.userId)
+            .isInteger()
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
@@ -457,19 +488,28 @@ var changeOtherUserPassword = function (req, callback) {
         }
         var newPassword = md5(req.body.newPassword);
         var sqlQuery = 'UPDATE ?? SET  ?? = ?  WHERE ??=? AND ??=?';
-        var inserts = ['db_users', 'password', newPassword, 'id', req.body.userId, 'isDeleted', false];
+        var inserts = [
+            'db_users',
+            'password',
+            newPassword,
+            'id',
+            req.body.userId,
+            'isDeleted',
+            false
+        ];
         sqlQuery = mysql.format(sqlQuery, inserts);
 
-        dbHelper.executeQueryPromise(sqlQuery).then(function (result) {
-            if (result.affectedRows == 1) {
-                var response = new responseModel.objectResponse();
-                response.message = responseMessage.CHANGE_PASSWORD;
-                return callback(null, response);
-            }
-            return callback(ApiException.newNotAllowedError(api_errors.wrong_oldpassword.error_code, null)
-                .addDetails(api_errors.wrong_oldpassword.description));
-        }, function (error) {
-            return callback(error);
-        });
+        dbHelper
+            .executeQueryPromise(sqlQuery)
+            .then(function (result) {
+                if (result.affectedRows == 1) {
+                    var response = new responseModel.objectResponse();
+                    response.message = responseMessage.CHANGE_PASSWORD;
+                    return callback(null, response);
+                }
+                return callback(ApiException.newNotAllowedError(api_errors.wrong_oldpassword.error_code, null).addDetails(api_errors.wrong_oldpassword.description));
+            }, function (error) {
+                return callback(error);
+            });
     });
 };

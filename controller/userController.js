@@ -1,5 +1,6 @@
 var userModel = require('../models/userModel');
 var userModel_admin = require('../models/userModel-admin');
+
 /**
  * Update profile controller
  * @request_type- PATCH
@@ -58,24 +59,6 @@ exports.blockUser = function(req, res, next) {
 };
 
 
-/**
- * Create junior admin
- * @request_type- PUT
- * @url- /secure/user/junioradmin
- * @param {Object} req - express request.
- * @param {Object} res - express response.
- * @param {function} next - next middleware callback.
- */
-
-exports.createJuniorAdmin = function(req, res, next) {
-    userModel.createJuniorAdmin(req, function(err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
-};
 
 
 /**
@@ -130,25 +113,6 @@ exports.deleteUser = function(req, res, next) {
 
 exports.endUserListing = function(req, res, next) {
     userModel_admin.endUserListing(req, function(err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
-};
-
-/**
- * Create public user
- * @request_type- PUT
- * @url- /secure/user/public
- * @param {Object} req - express request.
- * @param {Object} res - express response.
- * @param {function} next - next middleware callback.
- */
-
-exports.createPublicUser = function(req, res, next) {
-    userModel.createPublicUserViaAdmin(req, function(err, result) {
         if (err) {
             return next(err);
         } else {
