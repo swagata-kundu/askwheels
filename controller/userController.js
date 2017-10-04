@@ -10,8 +10,8 @@ var userModel_admin = require('../models/userModel-admin');
  * @param {function} next - next middleware callback.
  */
 
-exports.updateProfile = function(req, res, next) {
-    userModel.editProfile(req, function(err, result) {
+exports.updateProfile = function (req, res, next) {
+    userModel.editProfile(req, function (err, result) {
         if (err) {
             return next(err);
         } else {
@@ -28,8 +28,8 @@ exports.updateProfile = function(req, res, next) {
  * @param {function} next - next middleware callback.
  */
 
-exports.uploadPic = function(req, res, next) {
-    userModel.uploadProfilePic(req, function(err, result) {
+exports.uploadPic = function (req, res, next) {
+    userModel.uploadProfilePic(req, function (err, result) {
         if (err) {
             return next(err);
         } else {
@@ -48,8 +48,8 @@ exports.uploadPic = function(req, res, next) {
  * @param {function} next - next middleware callback.
  */
 
-exports.blockUser = function(req, res, next) {
-    userModel.blockUser(req, function(err, result) {
+exports.blockUser = function (req, res, next) {
+    userModel.blockUser(req, function (err, result) {
         if (err) {
             return next(err);
         } else {
@@ -70,8 +70,8 @@ exports.blockUser = function(req, res, next) {
  * @param {function} next - next middleware callback.
  */
 
-exports.userDetail = function(req, res, next) {
-    userModel_admin.userDetail(req, function(err, result) {
+exports.userDetail = function (req, res, next) {
+    userModel_admin.userDetail(req, function (err, result) {
         if (err) {
             return next(err);
         } else {
@@ -90,8 +90,8 @@ exports.userDetail = function(req, res, next) {
  * @param {function} next - next middleware callback.
  */
 
-exports.deleteUser = function(req, res, next) {
-    userModel_admin.deleteUser(req, function(err, result) {
+exports.deleteUser = function (req, res, next) {
+    userModel_admin.deleteUser(req, function (err, result) {
         if (err) {
             return next(err);
         } else {
@@ -103,16 +103,36 @@ exports.deleteUser = function(req, res, next) {
 
 
 /**
- * End user listing for admin
+ * Subseller listing for seller
  * @request_type- POST
- * @url- /secure/user/public
+ * @url- /secure/user/subseller/listing
  * @param {Object} req - express request.
  * @param {Object} res - express response.
  * @param {function} next - next middleware callback.
  */
 
-exports.endUserListing = function(req, res, next) {
-    userModel_admin.endUserListing(req, function(err, result) {
+exports.subsellerListing = function (req, res, next) {
+    userModel_admin.subsellerListing(req, function (err, result) {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
+
+/**
+ * Create sub seller for seller
+ * @request_type- POST
+ * @url- /secure/user/subseller
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.createSubseller = function (req, res, next) {
+    userModel_admin.addSubseller(req, function (err, result) {
         if (err) {
             return next(err);
         } else {

@@ -1,3 +1,4 @@
-exports.auth = require('../controller/authController');
-exports.user = require('../controller/userController');
-exports.upload = require('../controller/uploadController');
+exports.auth = require('./authController');
+exports.user = require('./userController');
+exports.upload = require('./uploadController');
+exports.auction = require('./auctionController');

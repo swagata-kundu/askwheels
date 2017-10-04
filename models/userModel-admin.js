@@ -7,6 +7,7 @@ var responseMessage = require('../assets/responseMessage');
 var dbNames = require('../assets/dbNames');
 var pagingHelper = require('../helper/paginationHelper');
 var api_errors = require('../assets/api_errors');
+var userModel = require('./userModel');
 
 var mysql = require('mysql');
 var async = require('async');
@@ -24,7 +25,7 @@ module.exports = userModel_Admin;
  * @param {function(Error,object)} callback - callback function.
  */
 
-userModel_Admin.endUserListing = function (req, callback) {
+userModel_Admin.subsellerListing = function (req, callback) {
     var rules = {
         searchText: Check.that(req.body.searchText).isOptional().isLengthInRange(0, 20),
         fromDate: Check.that(req.body.fromDate).isOptional().isDate(),
@@ -166,7 +167,22 @@ userModel_Admin.deleteUser = function (req, callback) {
     });
 };
 
-
+/**
+ * Add subseller
+ * @param {object} req -express request object
+ * @param {function(Error,object)} callback - callback function.
+ */
+userModel_Admin.addSubseller = function (req, callback) {
+    req.body.isInternalCall = true;
+    userModel.createPublicUser(req, (err, data) => {
+        if (err) {
+            return callback(err);
+        }
+        var response = new responseModel.objectResponse();
+        response.message = responseMessage.REGISTRATION_SUCCESSFULL;
+        return callback(null, response);
+    });
+};
 
 
 

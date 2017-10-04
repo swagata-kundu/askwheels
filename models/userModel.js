@@ -70,7 +70,11 @@ user.createPublicUser = function (req, callback) {
         if (err) {
             return callback(err);
         } else {
-            var insertData = sanitizeDataForUserTable(req.body);
+            var linkId = 0;
+            if (req.body.isInternalCall && req.auth.userId && req.auth.roleId === 1) {
+                linkId = req.auth.userId;
+            }
+            var insertData = sanitizeDataForUserTable(req.body, linkId);
             var sessionId = insertData.sessionId;
             insertUserData(insertData, req.body.roleId, function (err, userIdCreated) {
                 if (err) {
@@ -193,9 +197,9 @@ user.blockUser = function (req, callback) {
             }
             if (result.affectedRows == 1) {
                 var resopnse = new responseModel.objectResponse();
-                resopnse.message = req.body.flag
-                    ? responseMessage.USER_BLOCKED
-                    : responseMessage.USER_UNBLOCKED;
+                resopnse.message = req.body.flag ?
+                    responseMessage.USER_BLOCKED :
+                    responseMessage.USER_UNBLOCKED;
                 return callback(err, resopnse);
             }
             return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
@@ -263,7 +267,7 @@ var insertUserData = function (insertData, roleId, callback) {
  * Create insert object according to table column name from request body
  * @param {object} data
  */
-var sanitizeDataForUserTable = function (data) {
+var sanitizeDataForUserTable = function (data, linkId) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
     insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
@@ -281,9 +285,13 @@ var sanitizeDataForUserTable = function (data) {
     }
     insertObject['sessionId'] = uuid.v4();
     insertObject['isLive'] = false;
-    insertObject['address'] = data.address
-        ? data.address
-        : '';
+    insertObject['address'] = data.address ?
+        data.address :
+        '';
+    if (data.isInternalCall && linkId) {
+        insertObject['sellerId'] = linkId;
+    }
+
     return insertObject;
 };
 
@@ -456,9 +464,8 @@ var responseForSuccessfulSignUp = function (userDetail, userId, roleId) {
         'email': userDetail.email,
         'contactNo': userDetail.phone,
         'userId': userId,
-        'imgUrl': userDetail.imgUrl
-            ? userDetail.imgUrl
-            : '',
+        'imgUrl': userDetail.imgUrl ?
+            userDetail.imgUrl : '',
         'roleId': roleId
     };
     return response;
