@@ -60,3 +60,6 @@ typings/
 
 # vscode configuration
 .vscode/
+
+#upload folder
+uploads/

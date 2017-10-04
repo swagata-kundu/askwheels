@@ -1,5 +1,5 @@
 var responseModel = require('../assets/responseModel');
-
+var lodsah = require('lodash');
 
 
 //define module
@@ -14,6 +14,14 @@ module.exports = uploadModel;
  */
 
 uploadModel.uploadMultiple = function (req, callback) {
+
+    var images = [];
+
+    lodsah.forEach(req.files, (file, index) => {
+        images.push(file.path);
+    });
+
     var response = new responseModel.arrayResponse();
+    response.data = images;
     return callback(null, response);
 };
