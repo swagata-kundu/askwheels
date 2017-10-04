@@ -10,7 +10,7 @@ var controllerIndex = require('../controller/index');
 router.use(authUtil.verifySessionId);
 router.use('/user', userRouter);
 router.use('/auction', auctionRouter);
-router.post('/upload/multiple', upload.uploadMany, controllerIndex.upload.uploadMultiple);
+router.post('/upload', upload.uploadMany, controllerIndex.upload.uploadMultiple);
 
 
 module.exports = router;
