@@ -72,7 +72,7 @@ user.createPublicUser = function (req, callback) {
         } else {
             var linkId = 0;
             if (req.body.isInternalCall && req.auth.userId && req.auth.roleId === 1) {
-                linkId = req.auth.userId;
+                linkId = req.auth.id;
             }
             var insertData = sanitizeDataForUserTable(req.body, linkId);
             var sessionId = insertData.sessionId;

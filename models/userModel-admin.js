@@ -16,9 +16,6 @@ var lodash = require('lodash');
 var userModel_Admin = {};
 module.exports = userModel_Admin;
 
-
-
-
 /**
  * End user listing for admin
  * @param {object} req (express request object)
@@ -27,28 +24,49 @@ module.exports = userModel_Admin;
 
 userModel_Admin.subsellerListing = function (req, callback) {
     var rules = {
-        searchText: Check.that(req.body.searchText).isOptional().isLengthInRange(0, 20),
-        fromDate: Check.that(req.body.fromDate).isOptional().isDate(),
-        toDate: Check.that(req.body.toDate).isOptional().isDate(),
-        pageNo: Check.that(req.body.pageNo).isOptional().isInteger(),
-        pageSize: Check.that(req.body.pageSize).isOptional().isInteger(),
-        sortBy: Check.that(req.body.sortBy).isOptional().isNotEmptyOrBlank(),
-        sortOrder: Check.that(req.body.sortOrder).isOptional().isNotEmptyOrBlank()
+        searchText: Check
+            .that(req.body.searchText)
+            .isOptional()
+            .isLengthInRange(0, 20),
+        pageNo: Check
+            .that(req.body.pageNo)
+            .isOptional()
+            .isInteger(),
+        pageSize: Check
+            .that(req.body.pageSize)
+            .isOptional()
+            .isInteger(),
+        sortBy: Check
+            .that(req.body.sortBy)
+            .isOptional()
+            .isNotEmptyOrBlank(),
+        sortOrder: Check
+            .that(req.body.sortOrder)
+            .isOptional()
+            .isNotEmptyOrBlank()
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
+        var userId = req.auth.id;
         var pageInfo = pagingHelper.makePageObject(req.body);
-        var sql = 'CALL ?? ( ?,?,?,?,?,?,?)';
+        var sql = 'CALL ?? ( ?,?,?,?,?,?)';
         var parameters = [
-            dbNames.sp.endUserListingAdmin,
-            req.body.searchText ? req.body.searchText.trim() : '',
-            req.body.fromDate ? new Date(req.body.fromDate) : null,
-            req.body.toDate ? new Date(req.body.toDate) : null,
-            pageInfo.skip, pageInfo.limit,
-            req.body.sortBy ? req.body.sortBy : '',
-            req.body.sortOrder ? req.body.sortOrder : ''
+            dbNames.sp.subsellerList, userId, req.body.searchText
+                ? req
+                    .body
+                    .searchText
+                    .trim()
+                : '',
+            pageInfo.skip,
+            pageInfo.limit,
+            req.body.sortBy
+                ? req.body.sortBy
+                : '',
+            req.body.sortOrder
+                ? req.body.sortOrder
+                : ''
         ];
         sql = mysql.format(sql, parameters);
         dbHelper.executeQuery(sql, function (err, result) {
@@ -73,7 +91,9 @@ userModel_Admin.subsellerListing = function (req, callback) {
 
 userModel_Admin.userDetail = function (req, callback) {
     var rules = {
-        userId: Check.that(req.params.userId).isMYSQLId()
+        userId: Check
+            .that(req.params.userId)
+            .isMYSQLId()
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
@@ -96,7 +116,6 @@ userModel_Admin.userDetail = function (req, callback) {
     });
 };
 
-
 /**
  * Junior admin listing for admin
  * @param {object} req (express request object)
@@ -104,35 +123,35 @@ userModel_Admin.userDetail = function (req, callback) {
  */
 
 userModel_Admin.updateUserProfile = function (req, callback) {
-    async.series([
-        function (cb) {
-            validateUserObject(req, cb);
-        },
-        function (cb) {
-            if (req.body.email) {
-                checkDuplicateRegistratrtion(req.body.email, function (err, status) {
-                    if (err) {
-                        return cb(err);
-                    }
-                    if (status) {
-                        return cb(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null)
-                            .addDetails(api_errors.already_registered.description));
-                    }
+    async
+        .series([
+            function (cb) {
+                validateUserObject(req, cb);
+            },
+            function (cb) {
+                if (req.body.email) {
+                    checkDuplicateRegistratrtion(req.body.email, function (err, status) {
+                        if (err) {
+                            return cb(err);
+                        }
+                        if (status) {
+                            return cb(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null).addDetails(api_errors.already_registered.description));
+                        }
+                        return cb(null);
+                    });
+                } else {
                     return cb(null);
-                });
-            } else {
-                return cb(null);
+                }
+            },
+            function (cb) {
+                updateProfileData(req.body, req.body.userId, cb);
             }
-        },
-        function (cb) {
-            updateProfileData(req.body, req.body.userId, cb);
-        }
-    ], function (err, result) {
-        return callback(err, err ? null : result[2]);
-    });
+        ], function (err, result) {
+            return callback(err, err
+                ? null
+                : result[2]);
+        });
 };
-
-
 
 /**
  * Delete user
@@ -141,17 +160,16 @@ userModel_Admin.updateUserProfile = function (req, callback) {
  */
 userModel_Admin.deleteUser = function (req, callback) {
     var rules = {
-        userId: Check.that(req.body.userId).isInteger()
+        userId: Check
+            .that(req.body.userId)
+            .isInteger()
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
         var stringQuery = 'CALL ?? ( ?)';
-        var parameters = [
-            dbNames.sp.deleteUser,
-            req.body.userId
-        ];
+        var parameters = [dbNames.sp.deleteUser, req.body.userId];
         stringQuery = mysql.format(stringQuery, parameters);
         dbHelper.executeQuery(stringQuery, function (err, result) {
             if (err) {
@@ -174,6 +192,7 @@ userModel_Admin.deleteUser = function (req, callback) {
  */
 userModel_Admin.addSubseller = function (req, callback) {
     req.body.isInternalCall = true;
+    req.body.roleId = 2;
     userModel.createPublicUser(req, (err, data) => {
         if (err) {
             return callback(err);
@@ -184,31 +203,45 @@ userModel_Admin.addSubseller = function (req, callback) {
     });
 };
 
-
-
 var validateUserObject = function (req, callback) {
     var rules = {
-        userId: Check.that(req.body.userId).isInteger(),
-        firstName: Check.that(req.body.firstName).isNotEmptyOrBlank().isLengthInRange(1, 50),
-        lastName: Check.that(req.body.lastName).isNotEmptyOrBlank().isLengthInRange(1, 50),
-        contactNo: Check.that(req.body.contactNo).isOptional().isNotEmptyOrBlank().isLengthInRange(10, 20),
-        roleId: Check.that(req.body.roleId).isInteger().isNumberInRange(1, 4)
+        userId: Check
+            .that(req.body.userId)
+            .isInteger(),
+        firstName: Check
+            .that(req.body.firstName)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(1, 50),
+        lastName: Check
+            .that(req.body.lastName)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(1, 50),
+        contactNo: Check
+            .that(req.body.contactNo)
+            .isOptional()
+            .isNotEmptyOrBlank()
+            .isLengthInRange(10, 20),
+        roleId: Check
+            .that(req.body.roleId)
+            .isInteger()
+            .isNumberInRange(1, 4)
     };
     appUtils.validateChecks(rules, callback);
 };
 
-
 /**
  * Use for updating other user's profile.
  * @param data{object} -
- * @param userId(int)- 
+ * @param userId(int)-
  * @param {function(Error,object)} callback - callback function.
  */
 var updateProfileData = function (data, userId, callback) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
     insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
-    insertObject['phone'] = data.contactNo ? data.contactNo : '';
+    insertObject['phone'] = data.contactNo
+        ? data.contactNo
+        : '';
     if (data.imgUrl) {
         insertObject['imgUrl'] = data.imgUrl;
     }
@@ -216,26 +249,33 @@ var updateProfileData = function (data, userId, callback) {
         insertObject['email'] = data.email;
     }
     var stringQuery = 'UPDATE ?? SET ? WHERE ??=? AND ??=?';
-    var inserts = ['db_users', insertObject, 'id', userId, 'isDeleted', false];
+    var inserts = [
+        'db_users',
+        insertObject,
+        'id',
+        userId,
+        'isDeleted',
+        false
+    ];
     stringQuery = mysql.format(stringQuery, inserts);
-    dbHelper.executeQueryPromise(stringQuery).then(function (result) {
-        if (result.affectedRows == 1) {
-            var response = new responseModel.objectResponse();
-            response.message = responseMessage.PROFILE_UPDATED;
+    dbHelper
+        .executeQueryPromise(stringQuery)
+        .then(function (result) {
+            if (result.affectedRows == 1) {
+                var response = new responseModel.objectResponse();
+                response.message = responseMessage.PROFILE_UPDATED;
 
-            return callback(null, response);
-        }
-        return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
-    }, function (error) {
-        return callback(error);
-    });
+                return callback(null, response);
+            }
+            return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
+        }, function (error) {
+            return callback(error);
+        });
 };
-
-
 
 /**
  * Check existance of email id in db_users table
- * @param {string} emailId 
+ * @param {string} emailId
  * @param {function(Error,object)} callback - callback function
  */
 var checkDuplicateRegistratrtion = function (emailId, callback) {

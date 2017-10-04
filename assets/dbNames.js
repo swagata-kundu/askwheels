@@ -8,6 +8,7 @@ module.exports = {
         failedSignUp: 'sp_user_signup_failed',
         blockUser: 'sp_user_block',
         userDetail: 'sp_user_detail',
-        deleteUser: 'sp_delete_user'
+        deleteUser: 'sp_delete_user',
+        subsellerList: 'sp_subseller_list'
     }
 };
