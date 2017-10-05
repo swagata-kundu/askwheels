@@ -53,33 +53,32 @@ userModel_Admin.subsellerListing = function (req, callback) {
         var pageInfo = pagingHelper.makePageObject(req.body);
         var sql = 'CALL ?? ( ?,?,?,?,?,?)';
         var parameters = [
-            dbNames.sp.subsellerList, userId, req.body.searchText
-                ? req
-                    .body
-                    .searchText
-                    .trim()
-                : '',
+            dbNames.sp.subsellerList, userId, req.body.searchText ?
+            req
+            .body
+            .searchText
+            .trim() :
+            '',
             pageInfo.skip,
             pageInfo.limit,
-            req.body.sortBy
-                ? req.body.sortBy
-                : '',
-            req.body.sortOrder
-                ? req.body.sortOrder
-                : ''
+            req.body.sortBy ?
+            req.body.sortBy :
+            '',
+            req.body.sortOrder ?
+            req.body.sortOrder :
+            ''
         ];
         sql = mysql.format(sql, parameters);
         dbHelper.executeQuery(sql, function (err, result) {
             if (err) {
                 return callback(err);
             }
+            var response = new responseModel.arrayResponse();
             if (result[1].length) {
-                var response = new responseModel.arrayResponse();
                 response.data = result[1];
                 response.count = result[0][0].totalRecords;
-                return callback(err, response);
             }
-            return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
+            return callback(null, response);
         });
     });
 };
@@ -124,33 +123,33 @@ userModel_Admin.userDetail = function (req, callback) {
 
 userModel_Admin.updateUserProfile = function (req, callback) {
     async
-        .series([
-            function (cb) {
-                validateUserObject(req, cb);
-            },
-            function (cb) {
-                if (req.body.email) {
-                    checkDuplicateRegistratrtion(req.body.email, function (err, status) {
-                        if (err) {
-                            return cb(err);
-                        }
-                        if (status) {
-                            return cb(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null).addDetails(api_errors.already_registered.description));
-                        }
-                        return cb(null);
-                    });
-                } else {
+    .series([
+        function (cb) {
+            validateUserObject(req, cb);
+        },
+        function (cb) {
+            if (req.body.email) {
+                checkDuplicateRegistratrtion(req.body.email, function (err, status) {
+                    if (err) {
+                        return cb(err);
+                    }
+                    if (status) {
+                        return cb(ApiException.newNotAllowedError(api_errors.already_registered.error_code, null).addDetails(api_errors.already_registered.description));
+                    }
                     return cb(null);
-                }
-            },
-            function (cb) {
-                updateProfileData(req.body, req.body.userId, cb);
+                });
+            } else {
+                return cb(null);
             }
-        ], function (err, result) {
-            return callback(err, err
-                ? null
-                : result[2]);
-        });
+        },
+        function (cb) {
+            updateProfileData(req.body, req.body.userId, cb);
+        }
+    ], function (err, result) {
+        return callback(err, err ?
+            null :
+            result[2]);
+    });
 };
 
 /**
@@ -239,9 +238,9 @@ var updateProfileData = function (data, userId, callback) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
     insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
-    insertObject['phone'] = data.contactNo
-        ? data.contactNo
-        : '';
+    insertObject['phone'] = data.contactNo ?
+        data.contactNo :
+        '';
     if (data.imgUrl) {
         insertObject['imgUrl'] = data.imgUrl;
     }
