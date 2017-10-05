@@ -19,24 +19,6 @@ exports.updateProfile = function (req, res, next) {
         }
     });
 };
-/**
- * Upload profile picture
- * @request_type- POST
- * @url- /secure/user/profilepicture
- * @param {Object} req - express request.
- * @param {Object} res - express response.
- * @param {function} next - next middleware callback.
- */
-
-exports.uploadPic = function (req, res, next) {
-    userModel.uploadProfilePic(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
-};
 
 
 /**

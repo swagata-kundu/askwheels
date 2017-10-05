@@ -9,6 +9,7 @@ module.exports = {
         blockUser: 'sp_user_block',
         userDetail: 'sp_user_detail',
         deleteUser: 'sp_delete_user',
-        subsellerList: 'sp_subseller_list'
+        subsellerList: 'sp_subseller_list',
+        featureList: 'sp_vehicle_features'
     }
 };

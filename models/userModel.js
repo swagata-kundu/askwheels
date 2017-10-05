@@ -131,44 +131,6 @@ user.editProfile = function (req, callback) {
     }
 };
 
-/**
- * Use for uploading profile picture
- * @param {object} - req (express request object)
- * @param {function(Error,object)} callback - callback function.
- */
-
-user.uploadProfilePic = function (req, callback) {
-    var rules = {
-        userId: Check
-            .that(req.auth.id)
-            .isMYSQLId(),
-        file: Check
-            .that(req.file)
-            .isObjectType()
-    };
-
-    var userId = req.auth.id;
-    var bucketDetail = {
-        'folderName': 'profilepic',
-        'bucketName': 'devnightout1'
-    };
-    appUtils.validateChecks(rules, function (err) {
-        if (err) {
-            return callback(err);
-        }
-        awsHelper
-            .uploadSingle(req.file, bucketDetail)
-            .then(function (url) {
-                var updateObject = {
-                    'imgUrl': url
-                };
-                updateUserOwnProfile(updateObject, userId, callback);
-            }, function (error) {
-                return callback(error);
-
-            });
-    });
-};
 
 /**
  * Use for blocking user from login
