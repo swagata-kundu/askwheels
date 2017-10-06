@@ -17,7 +17,7 @@ var userModel_Admin = {};
 module.exports = userModel_Admin;
 
 /**
- * End user listing for admin
+ * Subseler listing for admin/seller
  * @param {object} req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
@@ -50,6 +50,9 @@ userModel_Admin.subsellerListing = function (req, callback) {
             return callback(err);
         }
         var userId = req.auth.id;
+        if (req.auth.roleId === 4 && req.body.sellerId) {
+            userId = req.body.sellerId;
+        }
         var pageInfo = pagingHelper.makePageObject(req.body);
         var sql = 'CALL ?? ( ?,?,?,?,?,?)';
         var parameters = [
@@ -82,6 +85,74 @@ userModel_Admin.subsellerListing = function (req, callback) {
         });
     });
 };
+
+
+/**
+ * Seller listing for admin
+ * @param {object} req (express request object)
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+userModel_Admin.sellerListing = function (req, callback) {
+    var rules = {
+        searchText: Check
+            .that(req.body.searchText)
+            .isOptional()
+            .isLengthInRange(0, 20),
+        pageNo: Check
+            .that(req.body.pageNo)
+            .isOptional()
+            .isInteger(),
+        pageSize: Check
+            .that(req.body.pageSize)
+            .isOptional()
+            .isInteger(),
+        sortBy: Check
+            .that(req.body.sortBy)
+            .isOptional()
+            .isNotEmptyOrBlank(),
+        sortOrder: Check
+            .that(req.body.sortOrder)
+            .isOptional()
+            .isNotEmptyOrBlank()
+    };
+    appUtils.validateChecks(rules, function (err) {
+        if (err) {
+            return callback(err);
+        }
+        var pageInfo = pagingHelper.makePageObject(req.body);
+        var sql = 'CALL ?? ( ?,?,?,?,?)';
+        var parameters = [
+            dbNames.sp.sellerList, req.body.searchText ?
+            req
+            .body
+            .searchText
+            .trim() :
+            '',
+            pageInfo.skip,
+            pageInfo.limit,
+            req.body.sortBy ?
+            req.body.sortBy :
+            '',
+            req.body.sortOrder ?
+            req.body.sortOrder :
+            ''
+        ];
+        sql = mysql.format(sql, parameters);
+        dbHelper.executeQuery(sql, function (err, result) {
+            if (err) {
+                return callback(err);
+            }
+            var response = new responseModel.arrayResponse();
+            if (result[1].length) {
+                response.data = result[1];
+                response.count = result[0][0].totalRecords;
+            }
+            return callback(null, response);
+        });
+    });
+};
+
 /**
  * Junior admin listing for admin
  * @param {object} req (express request object)

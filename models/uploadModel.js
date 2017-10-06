@@ -18,7 +18,7 @@ uploadModel.uploadMultiple = function (req, callback) {
     var images = [];
 
     lodsah.forEach(req.files, (file, index) => {
-        images.push(file.path);
+        images.push(`uploads/${file.filename}`);
     });
 
     var response = new responseModel.arrayResponse();

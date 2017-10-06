@@ -121,6 +121,26 @@ exports.subsellerListing = function (req, res, next) {
     });
 };
 
+/**
+ * Subseller listing for seller
+ * @request_type- POST
+ * @url- /secure/user/seller/listing
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.sellerListing = function (req, res, next) {
+    userModel_admin.sellerListing(req, function (err, result) {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
+
 
 /**
  * Create sub seller for seller
