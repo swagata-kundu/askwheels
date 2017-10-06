@@ -1,12 +1,10 @@
 var controllerIndex = require('../controller');
 
 var secureRouter = require('./secureRouter');
-var auctionRouter = require('./auctionRouter');
 
 var authUtil = require('../libs/authUtils');
 
 module.exports = function (app) {
-    app.use('/auction', auctionRouter);
     app.use('/secure', secureRouter);
     app.post('/signup', controllerIndex.auth.signUp);
     app.post('/login', controllerIndex.auth.login);

@@ -10,6 +10,7 @@ module.exports = {
         userDetail: 'sp_user_detail',
         deleteUser: 'sp_delete_user',
         subsellerList: 'sp_subseller_list',
-        sellerList: 'sp_seller_list'
+        sellerList: 'sp_seller_list',
+        featureList: 'sp_vehicle_features'
     }
 };

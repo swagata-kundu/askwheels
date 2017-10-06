@@ -32,13 +32,7 @@ var configureMulter = function (fileSizeMb) {
 var uploader = {};
 module.exports = uploader;
 
-/**
- * Middleware for uploading profile picture
- */
-uploader.uploadProfilePic = function (req, res, next) {
-    var upload = configureMulter(10).single('image');
-    handleUploadError(req, res, next, upload);
-};
+
 
 /**
  * Middleware for uploading multiple file
@@ -66,7 +60,3 @@ function handleUploadError(req, res, next, upload) {
     });
 }
 
-
-function cleanFilename(text) {
-    return text.split(' ').join('-').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-}
