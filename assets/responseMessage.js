@@ -13,6 +13,7 @@ module.exports = {
     USER_UNBLOCKED: 'User unblocked successfully',
     USER_NOT_FOUND: 'No user found',
     USER_DELETED: 'User deleted successfully',
+    VEHICLE_STATUS_CHANGED:'Vehicle status changed successfully'
 
 
 };

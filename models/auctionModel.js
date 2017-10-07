@@ -85,11 +85,105 @@ auction.listFeatures = function (req, callback) {
         var response = new responseModel.arrayResponse();
         response.data = features;
         response.count = features.length;
-        
+
         return callback(null, response);
 
     });
 
+};
+
+/**
+ * Vehicle listing for admin
+ * @param {object} req (express request object)
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+auction.vehicleListAdmin = function (req, callback) {
+    var rules = {
+        searchText: Check
+            .that(req.body.searchText)
+            .isOptional()
+            .isLengthInRange(0, 20),
+        pageNo: Check
+            .that(req.body.pageNo)
+            .isOptional()
+            .isInteger(),
+        pageSize: Check
+            .that(req.body.pageSize)
+            .isOptional()
+            .isInteger(),
+        sortBy: Check
+            .that(req.body.sortBy)
+            .isOptional()
+            .isNotEmptyOrBlank(),
+        sortOrder: Check
+            .that(req.body.sortOrder)
+            .isOptional()
+            .isNotEmptyOrBlank()
+    };
+    appUtils.validateChecks(rules, function (err) {
+        if (err) {
+            return callback(err);
+        }
+        var pageInfo = pagingHelper.makePageObject(req.body);
+        var sql = 'CALL ?? ( ?,?,?,?)';
+        var parameters = [
+            dbNames.sp.vehicleList, pageInfo.skip, pageInfo.limit, req.body.sortBy
+                ? req.body.sortBy
+                : '',
+            req.body.sortOrder
+                ? req.body.sortOrder
+                : ''
+        ];
+        sql = mysql.format(sql, parameters);
+        dbHelper.executeQuery(sql, function (err, result) {
+            if (err) {
+                return callback(err);
+            }
+            var response = new responseModel.arrayResponse();
+            if (result[1].length) {
+                response.data = result[1];
+                response.count = result[0][0].totalRecords;
+            }
+            return callback(null, response);
+        });
+    });
+};
+
+/**
+ * For change vehicle flags
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+auction.changeVehicleStatus = function (req, callback) {
+    var rules = {
+        businessId: Check
+            .that(req.body.vehicleId)
+            .isInteger(),
+        status: Check
+            .that(req.body.status)
+            .isBooleanType()
+    };
+    appUtils.validateChecks(rules, function (err) {
+        if (err) {
+            return callback(err);
+        }
+        var changeStatusObjects = {
+            'tableName': 'db_vehicle',
+            'fieldName': 'isLive',
+            'value': req.body.status,
+            'id': req.body.vehicleId
+        };
+        dbHelper.changeTableFlag(changeStatusObjects, function (err, result) {
+            if (err) {
+                return callback(err);
+            }
+            var response = new responseModel.objectResponse();
+            response.message = responseMessage.VEHICLE_STATUS_CHANGED;
+            return callback(null, response);
+
+        });
+    });
 };
 
 /**

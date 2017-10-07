@@ -11,6 +11,7 @@ module.exports = {
         deleteUser: 'sp_delete_user',
         subsellerList: 'sp_subseller_list',
         sellerList: 'sp_seller_list',
-        featureList: 'sp_vehicle_features'
+        featureList: 'sp_vehicle_features',
+        vehicleList: 'sp_vehicle_list_admin'
     }
 };
