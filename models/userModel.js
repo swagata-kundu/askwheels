@@ -40,6 +40,7 @@ user.createPublicUser = function (req, callback) {
             .isLengthInRange(1, 50),
         lastName: Check
             .that(req.body.lastName)
+            .isOptional()
             .isNotEmptyOrBlank()
             .isLengthInRange(1, 50),
         email: Check

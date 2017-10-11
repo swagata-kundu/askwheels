@@ -82,7 +82,8 @@ auth.login = function (req, callback) {
                 if (result.password == md5(req.body.password)) {
                     newSessionId = uuid.v4();
                     userDetail = result;
-                    updateUserDetailOnLogin(req, newSessionId, cb);
+                    // updateUserDetailOnLogin(req, newSessionId, cb);
+                    return cb(null);
                 } else {
                     return cb(ApiException.newNotAllowedError(api_errors.invalid_auth_credentials.error_code, null).addDetails(responseMessage.WRONG_PASSWORD));
                 }
@@ -94,7 +95,7 @@ auth.login = function (req, callback) {
             return callback(err);
         } else {
             var response = responseForSuccessfulLogin(userDetail);
-            return callback(null, response, newSessionId);
+            return callback(null, response, userDetail.sessionId);
         }
     });
 
@@ -110,17 +111,17 @@ var responseForSuccessfulLogin = function (userDetail) {
         'firstName': userDetail.firstName,
         'lastName': userDetail.lastName,
         'email': userDetail.email,
-        'contactNo': userDetail.phone
-            ? userDetail.phone
-            : '',
+        'contactNo': userDetail.phone ?
+            userDetail.phone :
+            '',
         'userId': userDetail.id,
-        'imgUrl': userDetail.imgUrl
-            ? userDetail.imgUrl
-            : '',
+        'imgUrl': userDetail.imgUrl ?
+            userDetail.imgUrl :
+            '',
         'roleId': userDetail.roleId,
-        'address': userDetail.address
-            ? userDetail.address
-            : ''
+        'address': userDetail.address ?
+            userDetail.address :
+            ''
 
     };
 
