@@ -142,3 +142,22 @@ exports.createSubseller = function (req, res, next) {
         }
     });
 };
+
+/**
+ * Create sub seller for seller
+ * @request_type- POST
+ * @url- /secure/user/seler/dashboard
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.sellerDashBoardInfo = function (req, res, next) {
+    userModel_admin.sellerDashBoardInfo(req, function (err, result) {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};

@@ -174,7 +174,7 @@ auction.vehicleListAdmin = function (req, callback) {
         var pageInfo = pagingHelper.makePageObject(req.body);
         var sql = 'CALL ?? ( ?,?,?,?)';
         var parameters = [
-            dbNames.sp.vehicleList, pageInfo.skip, pageInfo.limit, req.body.sortBy ?
+            dbNames.sp.vehicleListAdmin, pageInfo.skip, pageInfo.limit, req.body.sortBy ?
             req.body.sortBy :
             '',
             req.body.sortOrder ?
@@ -216,6 +216,47 @@ auction.changeVehicleStatus = function (req, callback) {
         }
         changeVehicleStatusFlag(req.body.vehicleId, req.body.status, callback);
     });
+};
+
+/**
+ * For vehicle listing seller and subseller
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+auction.vehicleListSeller = function (req, callback) {
+
+    var sellerId = 0;
+    var subsellerId = 0;
+
+    if (req.auth.roleId === 1) {
+        sellerId = req.auth.id;
+    }
+
+    if (req.auth.roleId === 2) {
+        subsellerId = req.auth.id;
+    }
+
+    var pageInfo = pagingHelper.makePageObject(req.body);
+    var sql = 'CALL ?? ( ?,?,?,?)';
+    var parameters = [
+        dbNames.sp.vehicleListSeller, sellerId,
+        subsellerId,
+        pageInfo.skip, pageInfo.limit,
+    ];
+    sql = mysql.format(sql, parameters);
+    dbHelper.executeQuery(sql, function (err, result) {
+        if (err) {
+            return callback(err);
+        }
+        var response = new responseModel.arrayResponse();
+        if (result[1].length) {
+            response.data = result[1];
+            response.count = result[0][0].totalRecords;
+        }
+        return callback(null, response);
+    });
+
 };
 
 /**

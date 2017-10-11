@@ -273,6 +273,46 @@ userModel_Admin.addSubseller = function (req, callback) {
     });
 };
 
+/**
+ * Seller dashboard info admin
+ * @param {object} req -express request object
+ * @param {function(Error,object)} callback - callback function.
+ */
+userModel_Admin.sellerDashBoardInfo = function (req, callback) {
+
+    var sellerId = 0;
+    var subsellerId = 0;
+
+    if (req.auth.roleId === 1) {
+        sellerId = req.auth.id;
+    }
+
+    if (req.auth.roleId === 2) {
+        subsellerId = req.auth.id;
+    }
+    var sql = 'CALL ?? ( ?,?)';
+    var parameters = [
+        dbNames.sp.sellerDashBoardInfo, sellerId,
+        subsellerId
+    ];
+    sql = mysql.format(sql, parameters);
+    dbHelper.executeQuery(sql, function (err, result) {
+        if (err) {
+            return callback(err);
+        }
+        var payload = {
+            liveAuctions: result[0],
+            upcomingAuctions: result[1],
+            pendingAuctions: result[2]
+        };
+        var response = new responseModel.objectResponse();
+        response.data = payload;
+
+        return callback(null, response);
+
+    });
+};
+
 var validateUserObject = function (req, callback) {
     var rules = {
         userId: Check

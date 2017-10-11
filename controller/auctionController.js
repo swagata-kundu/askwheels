@@ -21,9 +21,9 @@ exports.uploadVehicle = function (req, res, next) {
 
 
 /**
- * Upload behicle for auction
+ * Vehicle list admin
  * @request_type- POST
- * @url- /secure/auction/vehicle/list
+ * @url- /secure/auction/vehicle/admin/list
  * @param {Object} req - express request.
  * @param {Object} res - express response.
  * @param {function} next - next middleware callback.
@@ -39,10 +39,30 @@ exports.vehicleListAdmin = function (req, res, next) {
     });
 };
 
+
+/**
+ * Vehicle list Seller
+ * @request_type- POST
+ * @url- /secure/auction/vehicle/list
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.vehicleListSeller = function (req, res, next) {
+    auctionModel.vehicleListSeller(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
 /**
  * Change Vehicle Status
  * @request_type- PUT
- * @url- /secure/auction/vehicle/status
+ * @url- /secure/auction/vehicle/admin/status
  * @param {Object} req - express request.
  * @param {Object} res - express response.
  * @param {function} next - next middleware callback.
@@ -57,7 +77,6 @@ exports.changeVehicleStatus = function (req, res, next) {
         }
     });
 };
-
 
 
 /**
