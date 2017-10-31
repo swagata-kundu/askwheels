@@ -153,6 +153,73 @@ userModel_Admin.sellerListing = function (req, callback) {
     });
 };
 
+
+/**
+ * Dealer listing for admin
+ * @param {object} req (express request object)
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+userModel_Admin.dealerListing = function (req, callback) {
+    var rules = {
+        searchText: Check
+            .that(req.body.searchText)
+            .isOptional()
+            .isLengthInRange(0, 20),
+        pageNo: Check
+            .that(req.body.pageNo)
+            .isOptional()
+            .isInteger(),
+        pageSize: Check
+            .that(req.body.pageSize)
+            .isOptional()
+            .isInteger(),
+        sortBy: Check
+            .that(req.body.sortBy)
+            .isOptional()
+            .isNotEmptyOrBlank(),
+        sortOrder: Check
+            .that(req.body.sortOrder)
+            .isOptional()
+            .isNotEmptyOrBlank()
+    };
+    appUtils.validateChecks(rules, function (err) {
+        if (err) {
+            return callback(err);
+        }
+        var pageInfo = pagingHelper.makePageObject(req.body);
+        var sql = 'CALL ?? ( ?,?,?,?,?)';
+        var parameters = [
+            dbNames.sp.dealerList, req.body.searchText ?
+            req
+            .body
+            .searchText
+            .trim() :
+            '',
+            pageInfo.skip,
+            pageInfo.limit,
+            req.body.sortBy ?
+            req.body.sortBy :
+            '',
+            req.body.sortOrder ?
+            req.body.sortOrder :
+            ''
+        ];
+        sql = mysql.format(sql, parameters);
+        dbHelper.executeQuery(sql, function (err, result) {
+            if (err) {
+                return callback(err);
+            }
+            var response = new responseModel.arrayResponse();
+            if (result[1].length) {
+                response.data = result[1];
+                response.count = result[0][0].totalRecords;
+            }
+            return callback(null, response);
+        });
+    });
+};
+
 /**
  * Junior admin listing for admin
  * @param {object} req (express request object)
@@ -274,7 +341,7 @@ userModel_Admin.addSubseller = function (req, callback) {
 };
 
 /**
- * Seller dashboard info admin
+ * Seller dashboard info
  * @param {object} req -express request object
  * @param {function(Error,object)} callback - callback function.
  */
@@ -312,6 +379,35 @@ userModel_Admin.sellerDashBoardInfo = function (req, callback) {
 
     });
 };
+
+/**
+ * Dealer dashboard info
+ * @param {object} req -express request object
+ * @param {function(Error,object)} callback - callback function.
+ */
+userModel_Admin.dealerDashBoardInfo = function (req, callback) {
+
+    var sql = 'CALL ?? ()';
+    var parameters = [
+        dbNames.sp.dealerDashBoardInfo
+    ];
+    sql = mysql.format(sql, parameters);
+    dbHelper.executeQuery(sql, function (err, result) {
+        if (err) {
+            return callback(err);
+        }
+        var payload = {
+            liveAuctions: result[0],
+            upcomingAuctions: result[1],
+        };
+        var response = new responseModel.objectResponse();
+        response.data = payload;
+
+        return callback(null, response);
+
+    });
+};
+
 
 var validateUserObject = function (req, callback) {
     var rules = {

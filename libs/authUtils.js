@@ -37,7 +37,7 @@ authUtils.verifySessionId = function (req, res, next) {
                 return next(err);
             } else {
                 // save authentication info in request
-                authenticationDetail['isAuthenticated'] = true;
+                authenticationDetail.isAuthenticated = true;
                 req.auth = authenticationDetail;
                 return next();
             }
@@ -79,6 +79,22 @@ authUtils.verifySessionIdOptional = function (req, res, next) {
     }
 };
 
+
+/**
+ * Check Dealer
+ * @param req - express request.
+ * @param res - express response.
+ * @param next - express next.
+ * @return {*}
+ */
+authUtils.verifyDealer = function (req, res, next) {
+    if (req.auth && req.auth.roleId === 3) {
+        return next();
+    } else {
+        return next(ApiException.newUnauthorizedError(apiErrors.no_resource_access.error_code).addDetails(apiErrors.no_resource_access.description));
+    }
+};
+
 /**
  * Check admin
  * @param req - express request.
@@ -87,7 +103,7 @@ authUtils.verifySessionIdOptional = function (req, res, next) {
  * @return {*}
  */
 authUtils.verifyAdmin = function (req, res, next) {
-    if (req.auth && req.auth.roleId == 4) {
+    if (req.auth && req.auth.roleId === 4) {
         return next();
     } else {
         return next(ApiException.newUnauthorizedError(apiErrors.no_resource_access.error_code).addDetails(apiErrors.no_resource_access.description));

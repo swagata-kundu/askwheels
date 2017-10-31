@@ -11,9 +11,11 @@ module.exports = {
         deleteUser: 'sp_delete_user',
         subsellerList: 'sp_subseller_list',
         sellerList: 'sp_seller_list',
+        dealerList: 'sp_dealer_list',
         featureList: 'sp_vehicle_features',
         vehicleListAdmin: 'sp_vehicle_list_admin',
         vehicleListSeller: 'sp_vehicle_list_seller',
-        sellerDashBoardInfo: 'sp_seller_dashboard'
+        sellerDashBoardInfo: 'sp_seller_dashboard',
+        dealerDashBoardInfo: 'sp_dealer_dashboard'
     }
 };

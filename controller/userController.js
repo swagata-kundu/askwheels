@@ -123,6 +123,24 @@ exports.sellerListing = function (req, res, next) {
 };
 
 
+/**
+ * Dealer listing for admin
+ * @request_type- POST
+ * @url- /secure/user/dealer/listing
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.dealerListing = function (req, res, next) {
+    userModel_admin.dealerListing(req, function (err, result) {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
 
 /**
  * Create sub seller for seller
@@ -144,7 +162,7 @@ exports.createSubseller = function (req, res, next) {
 };
 
 /**
- * Create sub seller for seller
+ * Seller/Sub-Seller dashboard data
  * @request_type- POST
  * @url- /secure/user/seler/dashboard
  * @param {Object} req - express request.
@@ -154,6 +172,26 @@ exports.createSubseller = function (req, res, next) {
 
 exports.sellerDashBoardInfo = function (req, res, next) {
     userModel_admin.sellerDashBoardInfo(req, function (err, result) {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
+
+/**
+ * Dealer dashboard data
+ * @request_type- POST
+ * @url- /secure/user/dealer/dashboard
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.dealerDashBoardInfo = function (req, res, next) {
+    userModel_admin.dealerDashBoardInfo(req, function (err, result) {
         if (err) {
             return next(err);
         } else {
