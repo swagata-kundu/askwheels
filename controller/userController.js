@@ -199,3 +199,23 @@ exports.dealerDashBoardInfo = function (req, res, next) {
         }
     });
 };
+
+
+/**
+ * Admin dashboard data
+ * @request_type- POST
+ * @url- /secure/user/admin/dashboard
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.adminDashBoardInfo = function (req, res, next) {
+    userModel_admin.adminDashBoardInfo(req, function (err, result) {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};

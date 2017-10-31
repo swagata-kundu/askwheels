@@ -409,6 +409,36 @@ userModel_Admin.dealerDashBoardInfo = function (req, callback) {
 };
 
 
+/**
+ * Admin dashboard info
+ * @param {object} req -express request object
+ * @param {function(Error,object)} callback - callback function.
+ */
+userModel_Admin.adminDashBoardInfo = function (req, callback) {
+
+    var sql = 'CALL ?? ()';
+    var parameters = [
+        dbNames.sp.adminDashBoardInfo
+    ];
+    sql = mysql.format(sql, parameters);
+    dbHelper.executeQuery(sql, function (err, result) {
+        if (err) {
+            return callback(err);
+        }
+        var payload = {
+            pendingAuctions: result[0][0].pendingAuctions,
+            pendingSellers: result[1][0].pendingSellers,
+            pendingDealers: result[2][0].pendingDealers,
+
+        };
+        var response = new responseModel.objectResponse();
+        response.data = payload;
+
+        return callback(null, response);
+
+    });
+};
+
 var validateUserObject = function (req, callback) {
     var rules = {
         userId: Check

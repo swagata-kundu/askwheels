@@ -12,6 +12,7 @@ router.post('/subseller', controllerIndex.user.createSubseller);
 router.post('/subseller/listing', controllerIndex.user.subsellerListing);
 router.post('/dealer/listing', authUtils.verifyAdmin, controllerIndex.user.dealerListing);
 router.post('/dealer/dashboard', authUtils.verifyDealer, controllerIndex.user.dealerDashBoardInfo);
+router.post('/admin/dashboard', authUtils.verifyAdmin, controllerIndex.user.adminDashBoardInfo);
 router.get('/:userId', controllerIndex.user.userDetail);
 router.delete('/', authUtils.verifyAdmin, controllerIndex.user.deleteUser);
 

@@ -16,6 +16,8 @@ module.exports = {
         vehicleListAdmin: 'sp_vehicle_list_admin',
         vehicleListSeller: 'sp_vehicle_list_seller',
         sellerDashBoardInfo: 'sp_seller_dashboard',
-        dealerDashBoardInfo: 'sp_dealer_dashboard'
+        dealerDashBoardInfo: 'sp_dealer_dashboard',
+        adminDashBoardInfo: 'sp_admin_dashboard'
+        
     }
 };
