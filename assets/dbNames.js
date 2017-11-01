@@ -14,10 +14,13 @@ module.exports = {
         dealerList: 'sp_dealer_list',
         featureList: 'sp_vehicle_features',
         vehicleListAdmin: 'sp_vehicle_list_admin',
-        vehicleListSeller: 'sp_vehicle_list_seller',
+        auctionListSeller: 'sp_seller_auctions',
+        auctionListDealer: 'sp_dealer_auctions',
         sellerDashBoardInfo: 'sp_seller_dashboard',
         dealerDashBoardInfo: 'sp_dealer_dashboard',
-        adminDashBoardInfo: 'sp_admin_dashboard'
-        
+        adminDashBoardInfo: 'sp_admin_dashboard',
+        addDealerWishList: 'sp_dealer_wishlist_add',
+        dealerWishList: 'sp_dealer_wishlist'
+
     }
 };

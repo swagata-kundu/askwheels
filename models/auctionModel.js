@@ -219,12 +219,12 @@ auction.changeVehicleStatus = function (req, callback) {
 };
 
 /**
- * For vehicle listing seller and subseller
+ * For Auction listing seller and subseller
  * @param {object} req -express object,
  * @param {function(Error,object)} callback - callback function.
  */
 
-auction.vehicleListSeller = function (req, callback) {
+auction.auctionListSeller = function (req, callback) {
 
     var sellerId = 0;
     var subsellerId = 0;
@@ -237,27 +237,103 @@ auction.vehicleListSeller = function (req, callback) {
         subsellerId = req.auth.id;
     }
 
-    var pageInfo = pagingHelper.makePageObject(req.body);
-    var sql = 'CALL ?? ( ?,?,?,?)';
-    var parameters = [
-        dbNames.sp.vehicleListSeller, sellerId,
-        subsellerId,
-        pageInfo.skip, pageInfo.limit,
-    ];
-    sql = mysql.format(sql, parameters);
-    dbHelper.executeQuery(sql, function (err, result) {
+    async.series([
+        cb => {
+            var rules = {
+                auctionType: Check
+                    .that(req.body.auctionType)
+                    .isOptional()
+                    .isInteger(),
+                pageNo: Check
+                    .that(req.body.pageNo)
+                    .isOptional()
+                    .isInteger(),
+                pageSize: Check
+                    .that(req.body.pageSize)
+                    .isOptional()
+                    .isInteger(),
+            };
+            appUtils.validateChecks(rules, cb);
+        },
+        cb => {
+            var pageInfo = pagingHelper.makePageObject(req.body);
+            var sql = 'CALL ?? ( ?,?,?,?,?)';
+            var parameters = [
+                dbNames.sp.auctionListSeller,
+                sellerId,
+                subsellerId,
+                req.body.auctionType ? req.body.auctionType : 0,
+                pageInfo.skip, pageInfo.limit,
+            ];
+            sql = mysql.format(sql, parameters);
+            dbHelper.executeQuery(sql, cb);
+        }
+    ], (err, result) => {
         if (err) {
             return callback(err);
         }
         var response = new responseModel.arrayResponse();
-        if (result[1].length) {
-            response.data = result[1];
-            response.count = result[0][0].totalRecords;
+        var dbResult = result[1];
+        if (dbResult[1].length) {
+            response.data = dbResult[1];
+            response.count = dbResult[0][0].totalRecords;
         }
         return callback(null, response);
     });
-
 };
+
+/**
+ * For Auction listing dealer
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+auction.auctionListDealer = function (req, callback) {
+
+    async.series([
+        cb => {
+            var rules = {
+                auctionType: Check
+                    .that(req.body.auctionType)
+                    .isOptional()
+                    .isInteger(),
+                pageNo: Check
+                    .that(req.body.pageNo)
+                    .isOptional()
+                    .isInteger(),
+                pageSize: Check
+                    .that(req.body.pageSize)
+                    .isOptional()
+                    .isInteger(),
+            };
+            appUtils.validateChecks(rules, cb);
+        },
+        cb => {
+            var pageInfo = pagingHelper.makePageObject(req.body);
+            var sql = 'CALL ?? ( ?,?,?)';
+            var parameters = [
+                dbNames.sp.auctionListDealer,
+                req.body.auctionType ? req.body.auctionType : 0,
+                pageInfo.skip, pageInfo.limit,
+            ];
+            sql = mysql.format(sql, parameters);
+            dbHelper.executeQuery(sql, cb);
+        }
+    ], (err, result) => {
+        if (err) {
+            return callback(err);
+        }
+        var response = new responseModel.arrayResponse();
+        var dbResult = result[1];
+        if (dbResult[1].length) {
+            response.data = dbResult[1];
+            response.count = dbResult[0][0].totalRecords;
+        }
+        return callback(null, response);
+    });
+};
+
+
 
 /**
  * Insert vehicle information in database

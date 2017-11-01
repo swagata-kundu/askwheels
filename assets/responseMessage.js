@@ -13,5 +13,6 @@ module.exports = {
     USER_NOT_FOUND: 'No user found',
     USER_DELETED: 'User deleted successfully',
     VEHICLE_STATUS_CHANGED: 'Vehicle status changed successfully',
-    CHANGE_PASSWORD: 'Password Changed successfully'
+    CHANGE_PASSWORD: 'Password Changed successfully',
+    SUCCESS: 'Operation completed successfully'
 };

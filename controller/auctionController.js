@@ -43,14 +43,14 @@ exports.vehicleListAdmin = function (req, res, next) {
 /**
  * Vehicle list Seller
  * @request_type- POST
- * @url- /secure/auction/vehicle/list
+ * @url- /secure/auction/seller
  * @param {Object} req - express request.
  * @param {Object} res - express response.
  * @param {function} next - next middleware callback.
  */
 
-exports.vehicleListSeller = function (req, res, next) {
-    auctionModel.vehicleListSeller(req, (err, result) => {
+exports.auctionListSeller = function (req, res, next) {
+    auctionModel.auctionListSeller(req, (err, result) => {
         if (err) {
             return next(err);
         } else {
@@ -58,6 +58,26 @@ exports.vehicleListSeller = function (req, res, next) {
         }
     });
 };
+
+/**
+ * Vehicle list Seller
+ * @request_type- POST
+ * @url- /secure/auction/dealer
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.auctionListDealer = function (req, res, next) {
+    auctionModel.auctionListDealer(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
 
 /**
  * Change Vehicle Status
