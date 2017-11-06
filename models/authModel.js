@@ -10,7 +10,6 @@ var mailer = require('../notify/mailNotifier');
 var api_events = require('../assets/api_events');
 
 var md5 = require('md5');
-var uuid = require('node-uuid');
 var mysql = require('mysql');
 var async = require('async');
 var randomstring = require('randomstring');
@@ -69,7 +68,6 @@ auth.login = function (req, callback) {
             .isLengthInRange(4, 20)
     };
     var userDetail = {};
-    var newSessionId = '';
     async.series([
         function (cb) {
             appUtils.validateChecks(rules, cb);
@@ -80,9 +78,7 @@ auth.login = function (req, callback) {
                     return cb(err);
                 }
                 if (result.password == md5(req.body.password)) {
-                    newSessionId = uuid.v4();
                     userDetail = result;
-                    // updateUserDetailOnLogin(req, newSessionId, cb);
                     return cb(null);
                 } else {
                     return cb(ApiException.newNotAllowedError(api_errors.invalid_auth_credentials.error_code, null).addDetails(responseMessage.WRONG_PASSWORD));
@@ -111,17 +107,17 @@ var responseForSuccessfulLogin = function (userDetail) {
         'firstName': userDetail.firstName,
         'lastName': userDetail.lastName,
         'email': userDetail.email,
-        'contactNo': userDetail.phone ?
-            userDetail.phone :
-            '',
+        'contactNo': userDetail.phone
+            ? userDetail.phone
+            : '',
         'userId': userDetail.id,
-        'imgUrl': userDetail.imgUrl ?
-            userDetail.imgUrl :
-            '',
+        'imgUrl': userDetail.imgUrl
+            ? userDetail.imgUrl
+            : '',
         'roleId': userDetail.roleId,
-        'address': userDetail.address ?
-            userDetail.address :
-            ''
+        'address': userDetail.address
+            ? userDetail.address
+            : ''
 
     };
 
@@ -205,7 +201,7 @@ auth.forgetPassword = function (req, callback) {
             .isNotEmptyOrBlank()
             .isEmail()
     };
-    appUtils.validateChecks(rules, function (err, result) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }

@@ -5,7 +5,6 @@ var Check = require('../libs/core/Check');
 var appUtils = require('../libs/appUtils');
 var responseModel = require('../assets/responseModel');
 var responseMessage = require('../assets/responseMessage');
-var awsHelper = require('../helper/awsUploadHelper');
 var dbNames = require('../assets/dbNames');
 var api_events = require('../assets/api_events');
 var mailer = require('../notify/mailNotifier');
@@ -20,10 +19,10 @@ var user = {};
 module.exports = user;
 
 var _user_role = {
-    'seller': 1,
-    'sub_seller': 2,
-    'uploader': 3,
-    'admin': 4
+    seller: 1,
+    sub_seller: 2,
+    uploader: 3,
+    admin: 4
 };
 
 /**
@@ -67,30 +66,41 @@ user.createPublicUser = function (req, callback) {
             .isInteger()
             .isNumberInRange(1, 3)
     };
-    appUtils.validateChecks(rules, function (err) {
-        if (err) {
-            return callback(err);
-        } else {
-            var linkId = 0;
-            if (req.body.isInternalCall && req.auth.id && req.auth.roleId === 1) {
-                linkId = req.auth.id;
+    var linkId = 0;
+    if (req.body.isInternalCall && req.auth.id && req.auth.roleId === 1) {
+        linkId = req.auth.id;
+        rules.email = Check
+            .that(req.body.email)
+            .isOptional()
+            .isEmail()
+            .isLengthInRange(1, 100);
+        rules.contactNo = Check
+            .that(req.body.contactNo)
+            .isNotEmptyOrBlank()
+            .isLengthInRange(10, 20);
+    }
+    appUtils
+        .validateChecks(rules, function (err) {
+            if (err) {
+                return callback(err);
+            } else {
+
+                var insertData = sanitizeDataForUserTable(req.body, linkId);
+                var sessionId = insertData.sessionId;
+                insertUserData(insertData, req.body.roleId, function (err, userIdCreated) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    if (!req.body.isInternalCall) {
+                        mailer.sendMail(api_events.user_signup.event_code, insertData.email, insertData);
+                    }
+                    var response = new responseModel.objectResponse();
+                    response.data = responseForSuccessfulSignUp(insertData, userIdCreated, req.body.roleId);
+                    response.message = responseMessage.REGISTRATION_SUCCESSFULL;
+                    return callback(null, response, sessionId);
+                });
             }
-            var insertData = sanitizeDataForUserTable(req.body, linkId);
-            var sessionId = insertData.sessionId;
-            insertUserData(insertData, req.body.roleId, function (err, userIdCreated) {
-                if (err) {
-                    return callback(err);
-                }
-                if (!req.body.isInternalCall) {
-                    mailer.sendMail(api_events.user_signup.event_code, insertData.email, insertData);
-                }
-                var response = new responseModel.objectResponse();
-                response.data = responseForSuccessfulSignUp(insertData, userIdCreated, req.body.roleId);
-                response.message = responseMessage.REGISTRATION_SUCCESSFULL;
-                return callback(null, response, sessionId);
-            });
-        }
-    });
+        });
 };
 
 /**
@@ -103,7 +113,6 @@ user.createPublicUser = function (req, callback) {
  */
 
 user.changePassword = function (req, callback) {
-
     if (!req.body.userId) {
         changeUsersOwnPassword(req, callback);
     } else if (req.body.userId && req.auth.roleId === 4) {
@@ -111,7 +120,6 @@ user.changePassword = function (req, callback) {
     } else {
         return callback(ApiException.newBadRequestError(null));
     }
-
 };
 
 /**
@@ -121,7 +129,6 @@ user.changePassword = function (req, callback) {
  */
 
 user.editProfile = function (req, callback) {
-
     if (!req.body.userId) {
         updateUserOwnProfile(req.body, req.auth.id, callback);
     } else if (req.body.userId && req.auth.roleId === 4) {
@@ -131,7 +138,6 @@ user.editProfile = function (req, callback) {
         return callback(ApiException.newBadRequestError(null));
     }
 };
-
 
 /**
  * Use for blocking user from login
@@ -160,9 +166,9 @@ user.blockUser = function (req, callback) {
             }
             if (result.affectedRows == 1) {
                 var resopnse = new responseModel.objectResponse();
-                resopnse.message = req.body.flag ?
-                    responseMessage.USER_BLOCKED :
-                    responseMessage.USER_UNBLOCKED;
+                resopnse.message = req.body.flag
+                    ? responseMessage.USER_BLOCKED
+                    : responseMessage.USER_UNBLOCKED;
                 return callback(err, resopnse);
             }
             return callback(ApiException.newNotFoundError(null).addDetails(responseMessage.USER_NOT_FOUND));
@@ -186,8 +192,8 @@ user.failedSignUp = function (userId) {
 var addUserRole = function (userId, roleId, callback) {
     var stringQuery = 'INSERT INTO db_user_in_roles SET ?';
     var insertData = {
-        'roleId': roleId,
-        'userId': userId
+        roleId: roleId,
+        userId: userId
     };
     stringQuery = mysql.format(stringQuery, insertData);
     dbHelper.executeQuery(stringQuery, callback);
@@ -201,7 +207,7 @@ var addUserRole = function (userId, roleId, callback) {
  */
 
 var insertUserData = function (insertData, roleId, callback) {
-    checkDuplicateRegistratrtion(insertData.email, function (err, status) {
+    checkDuplicateRegistratrtion(insertData.email, insertData.phone, function (err, status) {
         if (err) {
             return callback(err);
         }
@@ -221,7 +227,6 @@ var insertUserData = function (insertData, roleId, callback) {
                 }
                 return callback(err, userId);
             });
-
         });
     });
 };
@@ -233,10 +238,14 @@ var insertUserData = function (insertData, roleId, callback) {
 var sanitizeDataForUserTable = function (data, linkId) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
-    insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
-    insertObject['email'] = data
-        .email
-        .trim();
+    insertObject['lastName'] = data.lastName
+        ? lodash.capitalize(data.lastName.trim())
+        : '';
+    insertObject['email'] = data.email
+        ? data
+            .email
+            .trim()
+        : '';
     if (data.contactNo) {
         insertObject['phone'] = data
             .contactNo
@@ -248,9 +257,9 @@ var sanitizeDataForUserTable = function (data, linkId) {
     }
     insertObject['sessionId'] = uuid.v4();
     insertObject['isLive'] = false;
-    insertObject['address'] = data.address ?
-        data.address :
-        '';
+    insertObject['address'] = data.address
+        ? data.address
+        : '';
     if (data.isInternalCall && linkId) {
         insertObject['sellerId'] = linkId;
     }
@@ -263,9 +272,16 @@ var sanitizeDataForUserTable = function (data, linkId) {
  * @param {string} emailId
  * @param {function(Error,object)} callback - callback function
  */
-var checkDuplicateRegistratrtion = function (emailId, callback) {
-    var sql = 'CALL ?? ( ?);';
-    var object = [dbNames.sp.checkDuplicateRegistration, emailId];
+var checkDuplicateRegistratrtion = function (emailId, contactNo, callback) {
+    var sql = 'CALL ?? ( ?,?);';
+    var object = [
+        dbNames.sp.checkDuplicateRegistration, emailId
+            ? emailId
+            : '',
+        contactNo
+            ? contactNo
+            : ''
+    ];
     sql = mysql.format(sql, object);
     dbHelper.executeQuery(sql, function (err, result) {
         if (err) {
@@ -344,7 +360,6 @@ var updateUserOwnProfile = function (data, userId, callback) {
     }
     if (data.lastName) {
         insertObject['lastName'] = lodash.capitalize(data.lastName.trim());
-
     }
     if (data.contactNo) {
         insertObject['phone'] = data
@@ -360,7 +375,6 @@ var updateUserOwnProfile = function (data, userId, callback) {
         insertObject['address'] = data
             .address
             .trim();
-
     }
 
     if (data.email) {
@@ -422,14 +436,15 @@ var updateData = function (insertObject, userId, callback) {
  */
 var responseForSuccessfulSignUp = function (userDetail, userId, roleId) {
     var response = {
-        'firstName': userDetail.firstName,
-        'lastName': userDetail.lastName,
-        'email': userDetail.email,
-        'contactNo': userDetail.phone,
-        'userId': userId,
-        'imgUrl': userDetail.imgUrl ?
-            userDetail.imgUrl : '',
-        'roleId': roleId
+        firstName: userDetail.firstName,
+        lastName: userDetail.lastName,
+        email: userDetail.email,
+        contactNo: userDetail.phone,
+        userId: userId,
+        imgUrl: userDetail.imgUrl
+            ? userDetail.imgUrl
+            : '',
+        roleId: roleId
     };
     return response;
 };
