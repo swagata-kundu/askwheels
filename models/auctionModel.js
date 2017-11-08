@@ -28,9 +28,7 @@ auction.uploadVehicle = function (req, callback) {
         },
         (insertInfo, cb) => {
             var vehicleId = insertInfo.insertId;
-            let {
-                basic_info
-            } = req.body;
+            let {basic_info} = req.body;
             insertVehicleImages(vehicleId, basic_info.images, cb);
         }
     ], (err, result) => {
@@ -62,71 +60,27 @@ auction.listFeatures = function (req, callback) {
 
         var features = [];
 
-        features.push({
-            feature_type: "Breaking Traction",
-            feature_type_id: "feature_break",
-            options: result[0]
-        });
+        features.push({feature_type: "Breaking Traction", feature_type_id: "feature_break", options: result[0]});
 
-        features.push({
-            feature_type: "Comfort Conveneince",
-            feature_type_id: "feature_comfort",
-            options: result[1]
-        });
+        features.push({feature_type: "Comfort Conveneince", feature_type_id: "feature_comfort", options: result[1]});
 
-        features.push({
-            feature_type: "Exterior",
-            feature_type_id: "feature_doors",
-            options: result[2]
-        });
+        features.push({feature_type: "Exterior", feature_type_id: "feature_doors", options: result[2]});
 
-        features.push({
-            feature_type: "Entertainment",
-            feature_type_id: "feature_entertainment",
-            options: result[3]
-        });
+        features.push({feature_type: "Entertainment", feature_type_id: "feature_entertainment", options: result[3]});
 
-        features.push({
-            feature_type: "Exterior",
-            feature_type_id: "feature_exterior",
-            options: result[4]
-        });
+        features.push({feature_type: "Exterior", feature_type_id: "feature_exterior", options: result[4]});
 
-        features.push({
-            feature_type: "Instrumentation",
-            feature_type_id: "feature_instrument",
-            options: result[5]
-        });
+        features.push({feature_type: "Instrumentation", feature_type_id: "feature_instrument", options: result[5]});
 
-        features.push({
-            feature_type: "Lightning",
-            feature_type_id: "feature_light",
-            options: result[6]
-        });
+        features.push({feature_type: "Lightning", feature_type_id: "feature_light", options: result[6]});
 
-        features.push({
-            feature_type: "Safety",
-            feature_type_id: "feature_safety",
-            options: result[7]
-        });
+        features.push({feature_type: "Safety", feature_type_id: "feature_safety", options: result[7]});
 
-        features.push({
-            feature_type: "Seat",
-            feature_type_id: "feature_seat",
-            options: result[8]
-        });
+        features.push({feature_type: "Seat", feature_type_id: "feature_seat", options: result[8]});
 
-        features.push({
-            feature_type: "Lock Security",
-            feature_type_id: "feature_lock",
-            options: result[9]
-        });
+        features.push({feature_type: "Lock Security", feature_type_id: "feature_lock", options: result[9]});
 
-        features.push({
-            feature_type: "Storage",
-            feature_type_id: "feature_storage",
-            options: result[10]
-        });
+        features.push({feature_type: "Storage", feature_type_id: "feature_storage", options: result[10]});
 
         var response = new responseModel.arrayResponse();
         response.data = features;
@@ -174,12 +128,12 @@ auction.vehicleListAdmin = function (req, callback) {
         var pageInfo = pagingHelper.makePageObject(req.body);
         var sql = 'CALL ?? ( ?,?,?,?)';
         var parameters = [
-            dbNames.sp.vehicleListAdmin, pageInfo.skip, pageInfo.limit, req.body.sortBy ?
-            req.body.sortBy :
-            '',
-            req.body.sortOrder ?
-            req.body.sortOrder :
-            ''
+            dbNames.sp.vehicleListAdmin, pageInfo.skip, pageInfo.limit, req.body.sortBy
+                ? req.body.sortBy
+                : '',
+            req.body.sortOrder
+                ? req.body.sortOrder
+                : ''
         ];
         sql = mysql.format(sql, parameters);
         dbHelper.executeQuery(sql, function (err, result) {
@@ -251,7 +205,7 @@ auction.auctionListSeller = function (req, callback) {
                 pageSize: Check
                     .that(req.body.pageSize)
                     .isOptional()
-                    .isInteger(),
+                    .isInteger()
             };
             appUtils.validateChecks(rules, cb);
         },
@@ -259,11 +213,11 @@ auction.auctionListSeller = function (req, callback) {
             var pageInfo = pagingHelper.makePageObject(req.body);
             var sql = 'CALL ?? ( ?,?,?,?,?)';
             var parameters = [
-                dbNames.sp.auctionListSeller,
-                sellerId,
-                subsellerId,
-                req.body.auctionType ? req.body.auctionType : 0,
-                pageInfo.skip, pageInfo.limit,
+                dbNames.sp.auctionListSeller, sellerId, subsellerId, req.body.auctionType
+                    ? req.body.auctionType
+                    : 0,
+                pageInfo.skip,
+                pageInfo.limit
             ];
             sql = mysql.format(sql, parameters);
             dbHelper.executeQuery(sql, cb);
@@ -304,7 +258,7 @@ auction.auctionListDealer = function (req, callback) {
                 pageSize: Check
                     .that(req.body.pageSize)
                     .isOptional()
-                    .isInteger(),
+                    .isInteger()
             };
             appUtils.validateChecks(rules, cb);
         },
@@ -312,9 +266,11 @@ auction.auctionListDealer = function (req, callback) {
             var pageInfo = pagingHelper.makePageObject(req.body);
             var sql = 'CALL ?? ( ?,?,?)';
             var parameters = [
-                dbNames.sp.auctionListDealer,
-                req.body.auctionType ? req.body.auctionType : 0,
-                pageInfo.skip, pageInfo.limit,
+                dbNames.sp.auctionListDealer, req.body.auctionType
+                    ? req.body.auctionType
+                    : 0,
+                pageInfo.skip,
+                pageInfo.limit
             ];
             sql = mysql.format(sql, parameters);
             dbHelper.executeQuery(sql, cb);
@@ -333,8 +289,6 @@ auction.auctionListDealer = function (req, callback) {
     });
 };
 
-
-
 /**
  * Insert vehicle information in database
  * @param {object} - req (express request object)
@@ -343,34 +297,17 @@ auction.auctionListDealer = function (req, callback) {
 var insertVehicle = function (req, callback) {
     var insertObject = {};
 
-    const {
-        basic_info,
-        specification,
-        features,
-        inspection_report,
-        images
-    } = req.body;
+    const {basic_info, specification, features, inspection_report, images} = req.body;
 
     var omitKeys = ['images', 'max_power', 'max_torque'];
 
     try {
 
-        const {
-            dimensions_weight,
-            capacity,
-            engine_taransmission,
-            suspension_breaks_steering_tyres
-        } = specification;
+        const {dimensions_weight, capacity, engine_taransmission, suspension_breaks_steering_tyres} = specification;
 
-        const {
-            max_power,
-            max_torque
-        } = engine_taransmission;
+        const {max_power, max_torque} = engine_taransmission;
 
-        const {
-            feature,
-            manufacturer_warranty
-        } = features;
+        const {feature, manufacturer_warranty} = features;
 
         let featureString = {};
 
@@ -379,8 +316,9 @@ var insertVehicle = function (req, callback) {
                 featureString[key] = value.toString();
             }
         });
-
-        insertObject = lodash.assign({}, basic_info, dimensions_weight, capacity, engine_taransmission, suspension_breaks_steering_tyres, manufacturer_warranty, featureString);
+        let {insurance_policy} = basic_info;
+        let basic_info_1 = lodash.omit(basic_info, ['insurance_policy']);
+        insertObject = lodash.assign({}, basic_info_1, insurance_policy, dimensions_weight, capacity, engine_taransmission, suspension_breaks_steering_tyres, manufacturer_warranty, featureString);
 
         insertObject = lodash.omit(insertObject, omitKeys);
 
@@ -432,7 +370,6 @@ var insertVehicleImages = function (vehicleId, urls, callback) {
     dbHelper.executeQuery(stringQuery, callback);
 };
 
-
 var changeVehicleStatusFlag = function (vehicleId, status, callback) {
     var insertObject = {};
 
@@ -441,38 +378,22 @@ var changeVehicleStatusFlag = function (vehicleId, status, callback) {
         insertObject['admin_live_date'] = new Date();
     }
     var stringQuery = 'UPDATE ?? SET ? WHERE ??=?;';
-    var inserts = [
-        'db_vehicle',
-        insertObject,
-        'id',
-        vehicleId,
-    ];
+    var inserts = ['db_vehicle', insertObject, 'id', vehicleId];
     stringQuery = mysql.format(stringQuery, inserts);
     dbHelper
         .executeQueryPromise(stringQuery)
         .then(function (result) {
-                var response = new responseModel.objectResponse();
-                return callback(null, response);
-            },
-            function (error) {
-                return callback(error);
-            });
+            var response = new responseModel.objectResponse();
+            return callback(null, response);
+        }, function (error) {
+            return callback(error);
+        });
 };
 
-
-
-// var changeStatusObjects = {
-//     'tableName': 'db_vehicle',
-//     'fieldName': 'isLive',
-//     'value': req.body.status,
-//     'id': req.body.vehicleId
-// };
-// dbHelper.changeTableFlag(changeStatusObjects, function (err, result) {
-//     if (err) {
-//         return callback(err);
-//     }
-//     var response = new responseModel.objectResponse();
-//     response.message = responseMessage.VEHICLE_STATUS_CHANGED;
-//     return callback(null, response);
-
+// var changeStatusObjects = {     'tableName': 'db_vehicle',     'fieldName':
+// 'isLive',     'value': req.body.status,     'id': req.body.vehicleId };
+// dbHelper.changeTableFlag(changeStatusObjects, function (err, result) {     if
+// (err) {         return callback(err);     }     var response = new
+// responseModel.objectResponse();     response.message =
+// responseMessage.VEHICLE_STATUS_CHANGED;     return callback(null, response);
 // });
