@@ -157,18 +157,18 @@ auction.vehicleListAdmin = function (req, callback) {
  */
 auction.changeVehicleStatus = function (req, callback) {
     var rules = {
-        businessId: Check
+        vehicleId: Check
             .that(req.body.vehicleId)
             .isInteger(),
         status: Check
             .that(req.body.status)
-            .isBooleanType()
+            .isInteger()
     };
     appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
-        changeVehicleStatusFlag(req.body.vehicleId, req.body.status, callback);
+        changeVehicleStatusFlag(req.body, callback);
     });
 };
 
@@ -370,12 +370,15 @@ var insertVehicleImages = function (vehicleId, urls, callback) {
     dbHelper.executeQuery(stringQuery, callback);
 };
 
-var changeVehicleStatusFlag = function (vehicleId, status, callback) {
+var changeVehicleStatusFlag = function (vehicleobject, callback) {
+    let {vehicleId, status, reason} = vehicleobject;
     var insertObject = {};
-
-    insertObject['isLive'] = status;
-    if (status) {
-        insertObject['admin_live_date'] = new Date();
+    insertObject.vehicle_status = status;
+    if (status == 2) {
+        insertObject.admin_live_date = new Date();
+    }
+    if (status == 3) {
+        insertObject.reject_reason = reason;
     }
     var stringQuery = 'UPDATE ?? SET ? WHERE ??=?;';
     var inserts = ['db_vehicle', insertObject, 'id', vehicleId];
@@ -384,16 +387,9 @@ var changeVehicleStatusFlag = function (vehicleId, status, callback) {
         .executeQueryPromise(stringQuery)
         .then(function (result) {
             var response = new responseModel.objectResponse();
+            response.message = responseMessage.SUCCESS;
             return callback(null, response);
         }, function (error) {
             return callback(error);
         });
 };
-
-// var changeStatusObjects = {     'tableName': 'db_vehicle',     'fieldName':
-// 'isLive',     'value': req.body.status,     'id': req.body.vehicleId };
-// dbHelper.changeTableFlag(changeStatusObjects, function (err, result) {     if
-// (err) {         return callback(err);     }     var response = new
-// responseModel.objectResponse();     response.message =
-// responseMessage.VEHICLE_STATUS_CHANGED;     return callback(null, response);
-// });

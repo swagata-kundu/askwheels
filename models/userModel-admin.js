@@ -422,6 +422,32 @@ userModel_Admin.adminDashBoardInfo = function (req, callback) {
   });
 };
 
+/**
+ * Change dealer status
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+userModel_Admin.changeDealerStatus = function (req, callback) {
+
+  var rules = {
+    dealerId: Check
+      .that(req.body.dealerId)
+      .isInteger(),
+    biddingLimit: Check
+      .that(req.body.biddingLimit)
+      .isInteger(),
+    status: Check
+      .that(req.body.status)
+      .isBooleanType()
+  };
+  appUtils.validateChecks(rules, function (err) {
+    if (err) {
+      return callback(err);
+    }
+    changeDealerStatus(req.body, callback);
+  });
+};
+
 var validateUserObject = function (req, callback) {
   var rules = {
     userId: Check
@@ -517,4 +543,24 @@ var checkDuplicateRegistratrtion = function (emailId, contactNo, callback) {
     }
     return callback(null, false);
   });
+};
+
+var changeDealerStatus = function (dealerObject, callback) {
+  var insertObject = {};
+  let {status, dealerId, biddingLimit} = dealerObject;
+  insertObject.isLive = status;
+  insertObject.biddingLimit = biddingLimit;
+
+  var stringQuery = 'UPDATE ?? SET ? WHERE ??=?;';
+  var inserts = ['db_users', insertObject, 'id', dealerId];
+  stringQuery = mysql.format(stringQuery, inserts);
+  dbHelper
+    .executeQueryPromise(stringQuery)
+    .then(function (result) {
+      var response = new responseModel.objectResponse();
+      response.message = responseMessage.SUCCESS;
+      return callback(null, response);
+    }, function (error) {
+      return callback(error);
+    });
 };

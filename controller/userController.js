@@ -11,15 +11,15 @@ var userModel_admin = require('../models/userModel-admin');
  */
 
 exports.updateProfile = function (req, res, next) {
-    userModel.editProfile(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel
+        .editProfile(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
 
 /**
  * Block user from login
@@ -31,17 +31,15 @@ exports.updateProfile = function (req, res, next) {
  */
 
 exports.blockUser = function (req, res, next) {
-    userModel.blockUser(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel
+        .blockUser(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
-
-
 
 /**
  * User Detail
@@ -53,15 +51,15 @@ exports.blockUser = function (req, res, next) {
  */
 
 exports.userDetail = function (req, res, next) {
-    userModel_admin.userDetail(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .userDetail(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
 
 /**
  * Delete user for admin
@@ -73,16 +71,15 @@ exports.userDetail = function (req, res, next) {
  */
 
 exports.deleteUser = function (req, res, next) {
-    userModel_admin.deleteUser(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .deleteUser(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
-
 
 /**
  * Subseller listing for seller
@@ -94,13 +91,14 @@ exports.deleteUser = function (req, res, next) {
  */
 
 exports.subsellerListing = function (req, res, next) {
-    userModel_admin.subsellerListing(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .subsellerListing(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
 
 /**
@@ -113,15 +111,15 @@ exports.subsellerListing = function (req, res, next) {
  */
 
 exports.sellerListing = function (req, res, next) {
-    userModel_admin.sellerListing(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .sellerListing(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
 
 /**
  * Dealer listing for admin
@@ -133,13 +131,34 @@ exports.sellerListing = function (req, res, next) {
  */
 
 exports.dealerListing = function (req, res, next) {
-    userModel_admin.dealerListing(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .dealerListing(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
+};
+
+/**
+ * Change dealer status
+ * @request_type- PUT
+ * @url- /secure/user/dealer/status
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.changeDealerStatus = function (req, res, next) {
+    userModel_admin
+        .changeDealerStatus(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
 
 /**
@@ -152,13 +171,14 @@ exports.dealerListing = function (req, res, next) {
  */
 
 exports.createSubseller = function (req, res, next) {
-    userModel_admin.addSubseller(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .addSubseller(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
 
 /**
@@ -171,15 +191,15 @@ exports.createSubseller = function (req, res, next) {
  */
 
 exports.sellerDashBoardInfo = function (req, res, next) {
-    userModel_admin.sellerDashBoardInfo(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .sellerDashBoardInfo(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
 
 /**
  * Dealer dashboard data
@@ -191,15 +211,15 @@ exports.sellerDashBoardInfo = function (req, res, next) {
  */
 
 exports.dealerDashBoardInfo = function (req, res, next) {
-    userModel_admin.dealerDashBoardInfo(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .dealerDashBoardInfo(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
-
 
 /**
  * Admin dashboard data
@@ -211,11 +231,12 @@ exports.dealerDashBoardInfo = function (req, res, next) {
  */
 
 exports.adminDashBoardInfo = function (req, res, next) {
-    userModel_admin.adminDashBoardInfo(req, function (err, result) {
-        if (err) {
-            return next(err);
-        } else {
-            res.json(result);
-        }
-    });
+    userModel_admin
+        .adminDashBoardInfo(req, function (err, result) {
+            if (err) {
+                return next(err);
+            } else {
+                res.json(result);
+            }
+        });
 };
