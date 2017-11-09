@@ -364,7 +364,8 @@ userModel_Admin.sellerDashBoardInfo = function (req, callback) {
     var payload = {
       liveAuctions: result[0],
       upcomingAuctions: result[1],
-      pendingAuctions: result[2]
+      pendingAuctions: result[2],
+      rejectedAuctions: result[3]
     };
     var response = new responseModel.objectResponse();
     response.data = payload;

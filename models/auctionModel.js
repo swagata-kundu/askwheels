@@ -211,11 +211,17 @@ auction.auctionListSeller = function (req, callback) {
         },
         cb => {
             var pageInfo = pagingHelper.makePageObject(req.body);
-            var sql = 'CALL ?? ( ?,?,?,?,?)';
+            var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?,?,?,?)';
             var parameters = [
                 dbNames.sp.auctionListSeller, sellerId, subsellerId, req.body.auctionType
                     ? req.body.auctionType
                     : 0,
+                '',
+                0,
+                0,
+                '',
+                '',
+                '',
                 pageInfo.skip,
                 pageInfo.limit
             ];
