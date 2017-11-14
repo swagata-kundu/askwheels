@@ -53,7 +53,7 @@ app.use(useragent.express());
 
 
 app.use(morgan('dev'));
-app.use('/static', express.static(__dirname + '/public'));
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 require('./router/index')(app);
 
