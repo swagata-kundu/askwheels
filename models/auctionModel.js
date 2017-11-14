@@ -198,6 +198,18 @@ auction.auctionListSeller = function (req, callback) {
                     .that(req.body.auctionType)
                     .isOptional()
                     .isInteger(),
+                minPrice: Check
+                    .that(req.body.minPrice)
+                    .isOptional()
+                    .isInteger(),
+                maxPrice: Check
+                    .that(req.body.maxPrice)
+                    .isOptional()
+                    .isInteger(),
+                owner_type: Check
+                    .that(req.body.owner_type)
+                    .isOptional()
+                    .isInteger(),
                 pageNo: Check
                     .that(req.body.pageNo)
                     .isOptional()
@@ -216,12 +228,24 @@ auction.auctionListSeller = function (req, callback) {
                 dbNames.sp.auctionListSeller, sellerId, subsellerId, req.body.auctionType
                     ? req.body.auctionType
                     : 0,
-                '',
-                0,
-                0,
-                '',
-                '',
-                '',
+                req.body.sub_sellers
+                    ? req.body.sub_sellers
+                    : '',
+                req.body.minPrice
+                    ? req.body.minPrice
+                    : 0,
+                req.body.maxPrice
+                    ? req.body.maxPrice
+                    : 0,
+                req.body.fuel_type
+                    ? req.body.fuel_type
+                    : '',
+                req.body.owner_type
+                    ? req.body.owner_type
+                    : -1,
+                req.body.transmission_type
+                    ? req.body.transmission_type
+                    : '',
                 pageInfo.skip,
                 pageInfo.limit
             ];
@@ -257,6 +281,18 @@ auction.auctionListDealer = function (req, callback) {
                     .that(req.body.auctionType)
                     .isOptional()
                     .isInteger(),
+                minPrice: Check
+                    .that(req.body.minPrice)
+                    .isOptional()
+                    .isInteger(),
+                maxPrice: Check
+                    .that(req.body.maxPrice)
+                    .isOptional()
+                    .isInteger(),
+                owner_type: Check
+                    .that(req.body.owner_type)
+                    .isOptional()
+                    .isInteger(),
                 pageNo: Check
                     .that(req.body.pageNo)
                     .isOptional()
@@ -270,11 +306,26 @@ auction.auctionListDealer = function (req, callback) {
         },
         cb => {
             var pageInfo = pagingHelper.makePageObject(req.body);
-            var sql = 'CALL ?? ( ?,?,?)';
+            var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?)';
             var parameters = [
                 dbNames.sp.auctionListDealer, req.body.auctionType
                     ? req.body.auctionType
                     : 0,
+                req.body.minPrice
+                    ? req.body.minPrice
+                    : 0,
+                req.body.maxPrice
+                    ? req.body.maxPrice
+                    : 0,
+                req.body.fuel_type
+                    ? req.body.fuel_type
+                    : '',
+                req.body.owner_type
+                    ? req.body.owner_type
+                    : -1,
+                req.body.transmission_type
+                    ? req.body.transmission_type
+                    : '',
                 pageInfo.skip,
                 pageInfo.limit
             ];
