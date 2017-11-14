@@ -20,7 +20,7 @@ module.exports = {
         dealerDashBoardInfo: 'sp_dealer_dashboard',
         adminDashBoardInfo: 'sp_admin_dashboard',
         addDealerWishList: 'sp_dealer_wishlist_add',
-        dealerWishList: 'sp_dealer_wishlist'
-
+        dealerWishList: 'sp_dealer_wishlist',
+        auctionDetail: 'sp_vehicle_detail'
     }
 };

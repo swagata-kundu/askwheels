@@ -28,7 +28,9 @@ auction.uploadVehicle = function (req, callback) {
         },
         (insertInfo, cb) => {
             var vehicleId = insertInfo.insertId;
-            let {basic_info} = req.body;
+            let {
+                basic_info
+            } = req.body;
             insertVehicleImages(vehicleId, basic_info.images, cb);
         }
     ], (err, result) => {
@@ -60,27 +62,71 @@ auction.listFeatures = function (req, callback) {
 
         var features = [];
 
-        features.push({feature_type: "Breaking Traction", feature_type_id: "feature_break", options: result[0]});
+        features.push({
+            feature_type: "Breaking Traction",
+            feature_type_id: "feature_break",
+            options: result[0]
+        });
 
-        features.push({feature_type: "Comfort Conveneince", feature_type_id: "feature_comfort", options: result[1]});
+        features.push({
+            feature_type: "Comfort Conveneince",
+            feature_type_id: "feature_comfort",
+            options: result[1]
+        });
 
-        features.push({feature_type: "Exterior", feature_type_id: "feature_doors", options: result[2]});
+        features.push({
+            feature_type: "Exterior",
+            feature_type_id: "feature_doors",
+            options: result[2]
+        });
 
-        features.push({feature_type: "Entertainment", feature_type_id: "feature_entertainment", options: result[3]});
+        features.push({
+            feature_type: "Entertainment",
+            feature_type_id: "feature_entertainment",
+            options: result[3]
+        });
 
-        features.push({feature_type: "Exterior", feature_type_id: "feature_exterior", options: result[4]});
+        features.push({
+            feature_type: "Exterior",
+            feature_type_id: "feature_exterior",
+            options: result[4]
+        });
 
-        features.push({feature_type: "Instrumentation", feature_type_id: "feature_instrument", options: result[5]});
+        features.push({
+            feature_type: "Instrumentation",
+            feature_type_id: "feature_instrument",
+            options: result[5]
+        });
 
-        features.push({feature_type: "Lightning", feature_type_id: "feature_light", options: result[6]});
+        features.push({
+            feature_type: "Lightning",
+            feature_type_id: "feature_light",
+            options: result[6]
+        });
 
-        features.push({feature_type: "Safety", feature_type_id: "feature_safety", options: result[7]});
+        features.push({
+            feature_type: "Safety",
+            feature_type_id: "feature_safety",
+            options: result[7]
+        });
 
-        features.push({feature_type: "Seat", feature_type_id: "feature_seat", options: result[8]});
+        features.push({
+            feature_type: "Seat",
+            feature_type_id: "feature_seat",
+            options: result[8]
+        });
 
-        features.push({feature_type: "Lock Security", feature_type_id: "feature_lock", options: result[9]});
+        features.push({
+            feature_type: "Lock Security",
+            feature_type_id: "feature_lock",
+            options: result[9]
+        });
 
-        features.push({feature_type: "Storage", feature_type_id: "feature_storage", options: result[10]});
+        features.push({
+            feature_type: "Storage",
+            feature_type_id: "feature_storage",
+            options: result[10]
+        });
 
         var response = new responseModel.arrayResponse();
         response.data = features;
@@ -128,12 +174,12 @@ auction.vehicleListAdmin = function (req, callback) {
         var pageInfo = pagingHelper.makePageObject(req.body);
         var sql = 'CALL ?? ( ?,?,?,?)';
         var parameters = [
-            dbNames.sp.vehicleListAdmin, pageInfo.skip, pageInfo.limit, req.body.sortBy
-                ? req.body.sortBy
-                : '',
-            req.body.sortOrder
-                ? req.body.sortOrder
-                : ''
+            dbNames.sp.vehicleListAdmin, pageInfo.skip, pageInfo.limit, req.body.sortBy ?
+            req.body.sortBy :
+            '',
+            req.body.sortOrder ?
+            req.body.sortOrder :
+            ''
         ];
         sql = mysql.format(sql, parameters);
         dbHelper.executeQuery(sql, function (err, result) {
@@ -225,27 +271,27 @@ auction.auctionListSeller = function (req, callback) {
             var pageInfo = pagingHelper.makePageObject(req.body);
             var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?,?,?,?)';
             var parameters = [
-                dbNames.sp.auctionListSeller, sellerId, subsellerId, req.body.auctionType
-                    ? req.body.auctionType
-                    : 0,
-                req.body.sub_sellers
-                    ? req.body.sub_sellers
-                    : '',
-                req.body.minPrice
-                    ? req.body.minPrice
-                    : 0,
-                req.body.maxPrice
-                    ? req.body.maxPrice
-                    : 0,
-                req.body.fuel_type
-                    ? req.body.fuel_type
-                    : '',
-                req.body.owner_type
-                    ? req.body.owner_type
-                    : -1,
-                req.body.transmission_type
-                    ? req.body.transmission_type
-                    : '',
+                dbNames.sp.auctionListSeller, sellerId, subsellerId, req.body.auctionType ?
+                req.body.auctionType :
+                0,
+                req.body.sub_sellers ?
+                req.body.sub_sellers :
+                '',
+                req.body.minPrice ?
+                req.body.minPrice :
+                0,
+                req.body.maxPrice ?
+                req.body.maxPrice :
+                0,
+                req.body.fuel_type ?
+                req.body.fuel_type :
+                '',
+                req.body.owner_type ?
+                req.body.owner_type :
+                -1,
+                req.body.transmission_type ?
+                req.body.transmission_type :
+                '',
                 pageInfo.skip,
                 pageInfo.limit
             ];
@@ -308,24 +354,24 @@ auction.auctionListDealer = function (req, callback) {
             var pageInfo = pagingHelper.makePageObject(req.body);
             var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?)';
             var parameters = [
-                dbNames.sp.auctionListDealer, req.body.auctionType
-                    ? req.body.auctionType
-                    : 0,
-                req.body.minPrice
-                    ? req.body.minPrice
-                    : 0,
-                req.body.maxPrice
-                    ? req.body.maxPrice
-                    : 0,
-                req.body.fuel_type
-                    ? req.body.fuel_type
-                    : '',
-                req.body.owner_type
-                    ? req.body.owner_type
-                    : -1,
-                req.body.transmission_type
-                    ? req.body.transmission_type
-                    : '',
+                dbNames.sp.auctionListDealer, req.body.auctionType ?
+                req.body.auctionType :
+                0,
+                req.body.minPrice ?
+                req.body.minPrice :
+                0,
+                req.body.maxPrice ?
+                req.body.maxPrice :
+                0,
+                req.body.fuel_type ?
+                req.body.fuel_type :
+                '',
+                req.body.owner_type ?
+                req.body.owner_type :
+                -1,
+                req.body.transmission_type ?
+                req.body.transmission_type :
+                '',
                 pageInfo.skip,
                 pageInfo.limit
             ];
@@ -346,6 +392,48 @@ auction.auctionListDealer = function (req, callback) {
     });
 };
 
+
+/**
+ * Auction Detail
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+auction.auctionDetail = function (req, callback) {
+
+    async.series([
+        cb => {
+            var rules = {
+                vehicleId: Check
+                    .that(req.params.vehicleId)
+                    .isMYSQLId()
+            };
+            appUtils.validateChecks(rules, cb);
+        },
+        cb => {
+            var sql = 'CALL ?? ( ?)';
+            var parameters = [
+                dbNames.sp.auctionDetail, parseInt(req.params.vehicleId)
+            ];
+            sql = mysql.format(sql, parameters);
+            dbHelper.executeQuery(sql, cb);
+        }
+    ], (err, result) => {
+        if (err) {
+            return callback(err);
+        }
+        var response = new responseModel.objectResponse();
+        var dbResult = result[1];
+        if (dbResult[0].length) {
+            response.data = dbResult[0][0];
+            response.data.inspection_report = JSON.parse(dbResult[0][0].inspection_report ? dbResult[0][0].inspection_report : '')
+            const images = dbResult[1].map(image => image.url);
+            response.data.images = images;
+        }
+        return callback(null, response);
+    });
+};
+
 /**
  * Insert vehicle information in database
  * @param {object} - req (express request object)
@@ -354,13 +442,19 @@ auction.auctionListDealer = function (req, callback) {
 var insertVehicle = function (req, callback) {
     var insertObject = {};
 
-    const {basic_info, inspection_report, images} = req.body;
+    const {
+        basic_info,
+        inspection_report,
+        images
+    } = req.body;
 
     var omitKeys = ['images'];
 
     try {
 
-        let {insurance_policy} = basic_info;
+        let {
+            insurance_policy
+        } = basic_info;
         let basic_info_1 = lodash.omit(basic_info, ['insurance_policy']);
         insertObject = lodash.assign({}, basic_info_1, insurance_policy);
 
@@ -409,7 +503,11 @@ var insertVehicleImages = function (vehicleId, urls, callback) {
 };
 
 var changeVehicleStatusFlag = function (vehicleobject, callback) {
-    let {vehicleId, status, reason} = vehicleobject;
+    let {
+        vehicleId,
+        status,
+        reason
+    } = vehicleobject;
     var insertObject = {};
     insertObject.vehicle_status = status;
     if (status == 2) {

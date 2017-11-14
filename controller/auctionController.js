@@ -61,6 +61,24 @@ exports.auctionListSeller = function (req, res, next) {
 
 /**
  * Vehicle list Seller
+ * @request_type- GET
+ * @url- /secure/auction/vehicle/:vehicleId
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.auctionDetail = function (req, res, next) {
+    auctionModel.auctionDetail(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+/**
+ * Vehicle list Seller
  * @request_type- POST
  * @url- /secure/auction/dealer
  * @param {Object} req - express request.
@@ -77,7 +95,6 @@ exports.auctionListDealer = function (req, res, next) {
         }
     });
 };
-
 
 /**
  * Change Vehicle Status
