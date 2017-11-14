@@ -360,30 +360,30 @@ var insertVehicle = function (req, callback) {
 
     try {
 
-        const {dimensions_weight, capacity, engine_taransmission, suspension_breaks_steering_tyres} = specification;
+        // const {dimensions_weight, capacity, engine_taransmission, suspension_breaks_steering_tyres} = specification;
 
-        const {max_power, max_torque} = engine_taransmission;
+        // const {max_power, max_torque} = engine_taransmission;
 
-        const {feature, manufacturer_warranty} = features;
+        // const {feature, manufacturer_warranty} = features;
 
-        let featureString = {};
+        // let featureString = {};
 
-        lodash.forEach(feature, (value, key) => {
-            if (lodash.isArray(value)) {
-                featureString[key] = value.toString();
-            }
-        });
+        // lodash.forEach(feature, (value, key) => {
+        //     if (lodash.isArray(value)) {
+        //         featureString[key] = value.toString();
+        //     }
+        // });
         let {insurance_policy} = basic_info;
         let basic_info_1 = lodash.omit(basic_info, ['insurance_policy']);
-        insertObject = lodash.assign({}, basic_info_1, insurance_policy, dimensions_weight, capacity, engine_taransmission, suspension_breaks_steering_tyres, manufacturer_warranty, featureString);
+        insertObject = lodash.assign({}, basic_info_1, insurance_policy);
 
         insertObject = lodash.omit(insertObject, omitKeys);
 
-        insertObject.max_power_bhp = max_power.bhp;
-        insertObject.max_power_rpm = max_power.rpm;
+        // insertObject.max_power_bhp = max_power.bhp;
+        // insertObject.max_power_rpm = max_power.rpm;
 
-        insertObject.max_torque_nm = max_torque.nm;
-        insertObject.max_torque_rpm = max_torque.rpm;
+        // insertObject.max_torque_nm = max_torque.nm;
+        // insertObject.max_torque_rpm = max_torque.rpm;
 
         insertObject.evaluation_date = new Date(basic_info.evaluation_date);
 
