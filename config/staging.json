@@ -1,11 +1,11 @@
 {
     "port": 5000,
-    "hosturl": "http://13.126.216.190:5000/",
+    "hosturl": "http://52.163.123.122:5000/",
     "db": {
         "host": "localhost",
         "port": 3306,
         "user": "root",
-        "password": "hrhk@1234",
+        "password": "hrhk",
         "database": "askwheels_updated",
         "connectionLimit": 10,
         "waitForConnections": true,
