@@ -37,11 +37,6 @@ user.createPublicUser = function (req, callback) {
             .that(req.body.firstName)
             .isNotEmptyOrBlank()
             .isLengthInRange(1, 50),
-        lastName: Check
-            .that(req.body.lastName)
-            .isOptional()
-            .isNotEmptyOrBlank()
-            .isLengthInRange(1, 50),
         email: Check
             .that(req.body.email)
             .isNotEmptyOrBlank()
