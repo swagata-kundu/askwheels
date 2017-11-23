@@ -5,12 +5,9 @@ var responseModel = require('../assets/responseModel');
 var responseMessage = require('../assets/responseMessage');
 var dbNames = require('../assets/dbNames');
 var pagingHelper = require('../helper/paginationHelper');
-var api_errors = require('../assets/api_errors');
-var ApiException = require('../libs/core/ApiException');
 
 var mysql = require('mysql');
 var async = require('async');
-var lodash = require('lodash');
 
 var wishList = {};
 module.exports = wishList;

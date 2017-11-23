@@ -21,6 +21,8 @@ module.exports = {
         adminDashBoardInfo: 'sp_admin_dashboard',
         addDealerWishList: 'sp_dealer_wishlist_add',
         dealerWishList: 'sp_dealer_wishlist',
-        auctionDetail: 'sp_vehicle_detail'
+        auctionDetail: 'sp_vehicle_detail',
+        biddingInfo: 'sp_vehicle_bidding_info',
+        addBid: 'sp_add_bid',        
     }
 };
