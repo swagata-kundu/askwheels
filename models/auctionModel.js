@@ -391,6 +391,7 @@ auction.auctionDetail = function(req, callback) {
                 );
                 const images = dbResult[1].map(image => image.url);
                 response.data.images = images;
+                response.data.bids = dbResult[2];
             }
             return callback(null, response);
         }
