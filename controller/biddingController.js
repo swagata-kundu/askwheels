@@ -19,3 +19,24 @@ exports.submitBid = function (req, res, next) {
         }
     });
 };
+
+
+
+/**
+ * Get dealer bids
+ * @request_type- POST
+ * @url- /secure/bid/dealer
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.dealerBid = function (req, res, next) {
+    biddingModel.getDelaerBids(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};

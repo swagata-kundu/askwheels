@@ -23,6 +23,7 @@ module.exports = {
         dealerWishList: 'sp_dealer_wishlist',
         auctionDetail: 'sp_vehicle_detail',
         biddingInfo: 'sp_vehicle_bidding_info',
-        addBid: 'sp_add_bid',        
+        addBid: 'sp_add_bid',
+        dealerBids: 'sp_dealer_bids'
     }
 };

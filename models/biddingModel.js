@@ -13,6 +13,11 @@ const moment = require('moment');
 
 var bidding = {};
 module.exports = bidding;
+/**
+ * Submit new bid dealer
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
 
 bidding.submitBid = (req, callback) => {
     let { id, biddingLimit } = req.auth;
@@ -102,6 +107,53 @@ bidding.submitBid = (req, callback) => {
             var response = new responseModel.objectResponse();
             response.message = 'Bid submitted';
 
+            return callback(null, response);
+        }
+    );
+};
+/**
+ * Bid listing dealer
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+bidding.getDelaerBids = (req, callback) => {
+    async.series(
+        [
+            cb => {
+                var rules = {
+                    pageNo: Check.that(req.body.pageNo)
+                        .isOptional()
+                        .isInteger(),
+                    pageSize: Check.that(req.body.pageSize)
+                        .isOptional()
+                        .isInteger()
+                };
+                appUtils.validateChecks(rules, cb);
+            },
+            cb => {
+                var pageInfo = pagingHelper.makePageObject(req.body);
+                var sql = 'CALL ?? ( ?,?,?)';
+                var parameters = [
+                    dbNames.sp.dealerBids,
+                    req.auth.id,
+                    pageInfo.skip,
+                    pageInfo.limit
+                ];
+                sql = mysql.format(sql, parameters);
+                dbHelper.executeQuery(sql, cb);
+            }
+        ],
+        (err, result) => {
+            if (err) {
+                return callback(err);
+            }
+            var response = new responseModel.arrayResponse();
+            var dbResult = result[1];
+            if (dbResult[1].length) {
+                response.data = dbResult[1];
+                response.count = dbResult[0][0].totalRecords;
+            }
             return callback(null, response);
         }
     );
