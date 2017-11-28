@@ -52,5 +52,9 @@ module.exports = {
     bidding_not_allowed: {
         error_code: 'BIDDING_NOT_ALLOWED',
         description: 'Bidding time for this auction has been expired'
+    },
+    wrong_oldpassword: {
+        error_code: 'WORNG_OLD_PASSWORD',
+        description: 'Old password is wrong'
     }
 };
