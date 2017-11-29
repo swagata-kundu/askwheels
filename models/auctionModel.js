@@ -367,10 +367,11 @@ auction.auctionDetail = function(req, callback) {
                 appUtils.validateChecks(rules, cb);
             },
             cb => {
-                var sql = 'CALL ?? ( ?)';
+                var sql = 'CALL ?? ( ?,?)';
                 var parameters = [
                     dbNames.sp.auctionDetail,
-                    parseInt(req.params.vehicleId)
+                    parseInt(req.params.vehicleId),
+                    req.auth.id
                 ];
                 sql = mysql.format(sql, parameters);
                 dbHelper.executeQuery(sql, cb);
