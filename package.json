@@ -1,16 +1,11 @@
 {
-  "name": "kickstart_mysql",
+  "name": "askwheels_backend",
   "version": "1.0.0",
-  "description": "Boiler plate for internal mysql_based project implementation. It has built in user registration process implemented",
+  "description": "Askwheels backend REST API",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "Mysql",
-    "User",
-    "boilerplate"
-  ],
   "author": "SKK",
   "license": "ISC",
   "dependencies": {
@@ -34,5 +29,14 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "randomstring": "^1.1.5",
     "winston": "^2.3.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swagata-kundu/askwheels.git"
+  },
+  "bugs": {
+    "url": "https://github.com/swagata-kundu/askwheels/issues"
+  },
+  "homepage": "https://github.com/swagata-kundu/askwheels#readme"
 }
