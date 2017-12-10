@@ -20,7 +20,10 @@ module.exports = bidding;
  */
 
 bidding.submitBid = (req, callback) => {
-    let { id, biddingLimit } = req.auth;
+    let {
+        id,
+        biddingLimit
+    } = req.auth;
     async.series(
         [
             cb => {
@@ -50,7 +53,9 @@ bidding.submitBid = (req, callback) => {
                         dealer_total_bid
                     } = result[0][0];
 
-                    let { amount } = req.body;
+                    let {
+                        amount
+                    } = req.body;
 
                     let lastBidTime = moment(
                         auction_start_date,
@@ -92,6 +97,17 @@ bidding.submitBid = (req, callback) => {
                 var sql = 'CALL ?? ( ?,?,?)';
                 var parameters = [
                     dbNames.sp.addBid,
+                    req.body.vehicleId,
+                    id,
+                    req.body.amount
+                ];
+                sql = mysql.format(sql, parameters);
+                dbHelper.executeQuery(sql, cb);
+            },
+            cb => {
+                var sql = 'CALL ?? ( ?,?,?)';
+                var parameters = [
+                    dbNames.sp.dealerNotifyBids,
                     req.body.vehicleId,
                     id,
                     req.body.amount

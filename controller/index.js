@@ -4,3 +4,4 @@ exports.upload = require('./uploadController');
 exports.auction = require('./auctionController');
 exports.wishlist = require('./wishListController');
 exports.bid = require('./biddingController');
+exports.notification = require('./notificationController');

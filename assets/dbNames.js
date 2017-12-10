@@ -24,6 +24,9 @@ module.exports = {
         auctionDetail: 'sp_vehicle_detail',
         biddingInfo: 'sp_vehicle_bidding_info',
         addBid: 'sp_add_bid',
-        dealerBids: 'sp_dealer_bids'
+        dealerBids: 'sp_dealer_bids',
+        dealerNotifyBids: 'sp_add_dealer_bid_notification',
+        dealerNotification: 'sp_dealer_notifications',
+        sellerNotification: 'sp_seller_notifications'
     }
 };
