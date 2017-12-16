@@ -1,33 +1,33 @@
 {
-    "port": 5100,
-    "hosturl": "http://127.0.0.1:5100/",
-    "db": {
-        "host": "52.163.123.122",
-        "port": 3306,
-        "user": "root",
-        "password": "hrhk",
-        "database": "askwheels_updated",
-        "connectionLimit": 10,
-        "waitForConnections": true,
-        "dateStrings": true,
-        "multipleStatements": true
+  "port": 5100,
+  "hosturl": "http://127.0.0.1:5100/",
+  "db": {
+    "host": "13.126.165.127",
+    "port": 3306,
+    "user": "root",
+    "password": "hrhk@1234",
+    "database": "askwheels_updated_1",
+    "connectionLimit": 10,
+    "waitForConnections": true,
+    "dateStrings": true,
+    "multipleStatements": true
+  },
+  "mailFrom": "testermundu@gmail.com",
+  "mailCredential": {
+    "service": "gmail",
+    "auth": {
+      "user": "mynightout.dev",
+      "pass": "hrhk@1234"
     },
-    "mailFrom": "testermundu@gmail.com",
-    "mailCredential": {
-        "service": "gmail",
-        "auth": {
-            "user": "mynightout.dev",
-            "pass": "hrhk@1234"
-        },
-        "tls": {
-            "rejectUnauthorized": false
-        }
-    },
-    "aws": {
-        "key": {
-            "accessKeyId": "AKIAIL3ZPXXKMF7NP3JA",
-            "secretAccessKey": "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",
-            "region": "us-east-1"
-        }
+    "tls": {
+      "rejectUnauthorized": false
     }
+  },
+  "aws": {
+    "key": {
+      "accessKeyId": "AKIAIL3ZPXXKMF7NP3JA",
+      "secretAccessKey": "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",
+      "region": "us-east-1"
+    }
+  }
 }
