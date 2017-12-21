@@ -25,6 +25,7 @@ module.exports = {
         biddingInfo: 'sp_vehicle_bidding_info',
         addBid: 'sp_add_bid',
         dealerBids: 'sp_dealer_bids',
+        sellerBids: 'sp_seller_bids',
         dealerNotifyBids: 'sp_add_dealer_bid_notification',
         dealerNotification: 'sp_dealer_notifications',
         sellerNotification: 'sp_seller_notifications'

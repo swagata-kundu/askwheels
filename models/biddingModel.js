@@ -20,10 +20,7 @@ module.exports = bidding;
  */
 
 bidding.submitBid = (req, callback) => {
-    let {
-        id,
-        biddingLimit
-    } = req.auth;
+    let { id, biddingLimit } = req.auth;
     async.series(
         [
             cb => {
@@ -53,9 +50,7 @@ bidding.submitBid = (req, callback) => {
                         dealer_total_bid
                     } = result[0][0];
 
-                    let {
-                        amount
-                    } = req.body;
+                    let { amount } = req.body;
 
                     let lastBidTime = moment(
                         auction_start_date,
@@ -171,6 +166,65 @@ bidding.getDelaerBids = (req, callback) => {
                 response.count = dbResult[0][0].totalRecords;
             }
             return callback(null, response);
+        }
+    );
+};
+
+/**
+ * Get seller bids
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+bidding.getSellerBids = (req, done) => {
+    async.series(
+        [
+            cb => {
+                var rules = {
+                    pageNo: Check.that(req.body.pageNo)
+                        .isOptional()
+                        .isInteger(),
+                    pageSize: Check.that(req.body.pageSize)
+                        .isOptional()
+                        .isInteger()
+                };
+                appUtils.validateChecks(rules, cb);
+            },
+            cb => {
+                let sellerId = 0;
+                let subsellerId = 0;
+
+                if (req.auth.roleId === 1) {
+                    sellerId = req.auth.id;
+                }
+
+                if (req.auth.roleId === 2) {
+                    subsellerId = req.auth.id;
+                }
+
+                var pageInfo = pagingHelper.makePageObject(req.body);
+                var sql = 'CALL ?? ( ?,?,?,?)';
+                var parameters = [
+                    dbNames.sp.sellerBids,
+                    sellerId ? sellerId : 0,
+                    subsellerId ? subsellerId : 0,
+                    pageInfo.skip,
+                    pageInfo.limit
+                ];
+                sql = mysql.format(sql, parameters);
+                dbHelper.executeQuery(sql, cb);
+            }
+        ],
+        (err, result) => {
+            if (err) {
+                return done(err);
+            }
+            var response = new responseModel.arrayResponse();
+            var dbResult = result[1];
+            if (dbResult[1].length) {
+                response.data = dbResult[1];
+                response.count = dbResult[0][0].totalRecords;
+            }
+            return done(null, response);
         }
     );
 };

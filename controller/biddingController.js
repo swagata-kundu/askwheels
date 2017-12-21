@@ -1,6 +1,5 @@
 var biddingModel = require('../models/biddingModel');
 
-
 /**
  * Upload behicle for auction
  * @request_type- POST
@@ -10,7 +9,7 @@ var biddingModel = require('../models/biddingModel');
  * @param {function} next - next middleware callback.
  */
 
-exports.submitBid = function (req, res, next) {
+exports.submitBid = function(req, res, next) {
     biddingModel.submitBid(req, (err, result) => {
         if (err) {
             return next(err);
@@ -19,8 +18,6 @@ exports.submitBid = function (req, res, next) {
         }
     });
 };
-
-
 
 /**
  * Get dealer bids
@@ -31,8 +28,27 @@ exports.submitBid = function (req, res, next) {
  * @param {function} next - next middleware callback.
  */
 
-exports.dealerBid = function (req, res, next) {
+exports.dealerBid = function(req, res, next) {
     biddingModel.getDelaerBids(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
+/**
+ * Get seller bids
+ * @request_type- POST
+ * @url- /secure/bid/seller
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.sellerBid = function(req, res, next) {
+    biddingModel.getSellerBids(req, (err, result) => {
         if (err) {
             return next(err);
         } else {
