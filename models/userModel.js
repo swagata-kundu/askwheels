@@ -108,7 +108,10 @@ user.createPublicUser = function(req, callback) {
 user.changePassword = function(req, callback) {
     if (!req.body.userId) {
         changeUsersOwnPassword(req, callback);
-    } else if (req.body.userId && req.auth.roleId === 4) {
+    } else if (
+        req.body.userId &&
+    (req.auth.roleId === 1 || req.auth.roleId === 4)
+    ) {
         changeOtherUserPassword(req, callback);
     } else {
         return callback(ApiException.newBadRequestError(null));
