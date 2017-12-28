@@ -1,6 +1,6 @@
 {
     "port": 5000,
-    "hosturl": "http://13.126.165.127.:5000/",
+    "hosturl": "http://13.126.165.127:5000/",
     "db": {
         "host": "localhost",
         "port": 3306,
