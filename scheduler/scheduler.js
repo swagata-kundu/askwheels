@@ -6,13 +6,11 @@ var dbNames = require('../assets/dbNames');
 
 
 var bidWinJob = new CronJob(
-    '* 5 * * * *',
-    function () {
-
-    },
+    '0 */5 * * * *',
     function () {
         job();
     },
+    function () {},
     true /* Start the job right now */
 );
 
