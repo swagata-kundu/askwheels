@@ -20,5 +20,7 @@ router.put(
 router.get('/features', controllerIndex.auction.listFeatures);
 router.put('/dealer/wishlist', controllerIndex.wishlist.addDealerWishList);
 router.get('/dealer/wishlist', controllerIndex.wishlist.dealerWishList);
+router.get('/dealer/win', controllerIndex.wishlist.dealerWins);
+
 
 module.exports = router;

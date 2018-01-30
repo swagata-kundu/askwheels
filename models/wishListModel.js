@@ -64,10 +64,42 @@ wishList.dealerWishList = function (req, callback) {
 
     async.series([
         cb => {
-            var pageInfo = pagingHelper.makePageObject(req.body);
             var sql = 'CALL ?? ( ?)';
             var parameters = [
                 dbNames.sp.dealerWishList,
+                req.auth.id
+            ];
+            sql = mysql.format(sql, parameters);
+            dbHelper.executeQuery(sql, cb);
+        }
+    ], (err, result) => {
+        if (err) {
+            return callback(err);
+        }
+        var response = new responseModel.arrayResponse();
+        var dbResult = result[0];
+        if (dbResult[0].length) {
+            response.data = dbResult[0];
+            response.count = dbResult[0].length;
+        }
+        return callback(null, response);
+    });
+};
+
+
+/**
+ * Show wish list for dealer
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+wishList.dealerWins = function (req, callback) {
+
+    async.series([
+        cb => {
+            var sql = 'CALL ?? ( ?)';
+            var parameters = [
+                dbNames.sp.dealerWins,
                 req.auth.id
             ];
             sql = mysql.format(sql, parameters);
