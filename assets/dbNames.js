@@ -28,6 +28,7 @@ module.exports = {
         sellerBids: 'sp_seller_bids',
         dealerNotifyBids: 'sp_add_dealer_bid_notification',
         dealerNotification: 'sp_dealer_notifications',
-        sellerNotification: 'sp_seller_notifications'
+        sellerNotification: 'sp_seller_notifications',
+        dealerWinCron: 'sp_dealer_win_job'
     }
 };

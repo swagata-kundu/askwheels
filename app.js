@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 var morgan = require('morgan');
 var lodash = require('lodash');
-
+var helmet = require('helmet');
 var config = require('config');
 var useragent = require('express-useragent');
 
@@ -31,13 +31,21 @@ var app = express();
 var db = require('./libs/mysql_db');
 db.connect();
 
+//adding cron
+require('./scheduler/scheduler');
 
+//helmet
+app.use(helmet());
 
 // user json body parser
 app.use(jsonBodyParser({
     limit: '50000kb'
 }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+app.use(bodyParser.urlencoded({
+    limit: '50mb',
+    extended: true,
+    parameterLimit: 50000
+}));
 
 //enable cors
 app.use(cors({
@@ -58,12 +66,12 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 require('./router/index')(app);
 
 
-app.listen(config.get('port'), function() {
+app.listen(config.get('port'), function () {
     app.emit('online');
 });
 
 // setup not found handler for requests un-served by any routes.
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     return next(ApiException.newNotFoundError('Request not handled.')
         .addDetails('Request not handled.'));
 });
@@ -72,7 +80,7 @@ var errorHandler = new ErrorHandler(logger);
 app.use(errorHandler.build());
 
 // print when online
-app.on('online', function() {
+app.on('online', function () {
     console.info('App is listening on port ', config.get('port'));
 });
 
