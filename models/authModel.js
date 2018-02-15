@@ -84,6 +84,9 @@ auth.login = function (req, callback) {
                     return cb(ApiException.newNotAllowedError(api_errors.invalid_auth_credentials.error_code, null).addDetails(responseMessage.WRONG_PASSWORD));
                 }
             });
+        },
+        function (cb) {
+            updateUserDetailOnLogin(req.body, userDetail.id, cb);
         }
 
     ], function (err) {
@@ -107,17 +110,14 @@ var responseForSuccessfulLogin = function (userDetail) {
         'firstName': userDetail.firstName,
         'lastName': userDetail.lastName,
         'email': userDetail.email,
-        'contactNo': userDetail.phone
-            ? userDetail.phone
-            : '',
+        'contactNo': userDetail.phone ?
+            userDetail.phone : '',
         'userId': userDetail.id,
-        'imgUrl': userDetail.imgUrl
-            ? userDetail.imgUrl
-            : '',
+        'imgUrl': userDetail.imgUrl ?
+            userDetail.imgUrl : '',
         'roleId': userDetail.roleId,
-        'address': userDetail.address
-            ? userDetail.address
-            : ''
+        'address': userDetail.address ?
+            userDetail.address : ''
 
     };
 
@@ -170,15 +170,16 @@ var validateUser = function (request, callback) {
  * @param{int}-newSessionId(int).
  * @param {function(Error,object)} callback - callback function.
  */
-var updateUserDetailOnLogin = function (req, newSessionId, callback) {
+var updateUserDetailOnLogin = function (body, userId, callback) {
     var updateObject = {};
 
-    if (req.body.deviceId) {
-        updateObject['deviceId'] = req.body.deviceId;
+    if (!body.deviceId) {
+        return callback(null);
     }
-    updateObject['sessionId'] = newSessionId;
-    var stringQuery = 'UPDATE ?? SET ? WHERE email = ?';
-    stringQuery = mysql.format(stringQuery, ['db_users', updateObject, req.body.email]);
+    updateObject['deviceId'] = body.deviceId;
+
+    var stringQuery = 'UPDATE ?? SET ? WHERE id = ?';
+    stringQuery = mysql.format(stringQuery, ['db_users', updateObject, userId]);
     dbHelper
         .executeQueryPromise(stringQuery)
         .then(function (result) {
