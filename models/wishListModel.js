@@ -118,3 +118,65 @@ wishList.dealerWins = function (req, callback) {
         return callback(null, response);
     });
 };
+
+
+/**
+ * For Auction listing seller and subseller
+ * @param {object} req -express object,
+ * @param {function(Error,object)} callback - callback function.
+ */
+
+wishList.sellerClosedDeals = function (req, callback) {
+    var sellerId = 0;
+    var subsellerId = 0;
+
+    if (req.auth.roleId === 1) {
+        sellerId = req.auth.id;
+    }
+
+    if (req.auth.roleId === 2) {
+        subsellerId = req.auth.id;
+    }
+
+    async.series(
+        [
+            cb => {
+                var rules = {
+                    pageNo: Check.that(req.body.pageNo)
+                        .isOptional()
+                        .isInteger(),
+                    pageSize: Check.that(req.body.pageSize)
+                        .isOptional()
+                        .isInteger()
+                };
+                appUtils.validateChecks(rules, cb);
+            },
+            cb => {
+                var pageInfo = pagingHelper.makePageObject(req.body);
+                var sql = 'CALL ?? ( ?,?,?,?,?)';
+                var parameters = [
+                    dbNames.sp.sellerClosedDeals,
+                    sellerId,
+                    subsellerId,
+                    req.body.sub_sellers ? req.body.sub_sellers : '',
+                    pageInfo.skip,
+                    pageInfo.limit
+                ];
+                sql = mysql.format(sql, parameters);
+                dbHelper.executeQuery(sql, cb);
+            }
+        ],
+        (err, result) => {
+            if (err) {
+                return callback(err);
+            }
+            var response = new responseModel.arrayResponse();
+            var dbResult = result[1];
+            if (dbResult[1].length) {
+                response.data = dbResult[1];
+                response.count = dbResult[0][0].totalRecords;
+            }
+            return callback(null, response);
+        }
+    );
+};

@@ -44,7 +44,7 @@ exports.dealerWishList = function (req, res, next) {
 /**
  * Show dealer wins
  * @request_type- GET
- * @url- /secure/auction/wins
+ * @url- /secure/auction/dealer/wins
  * @param {Object} req - express request.
  * @param {Object} res - express response.
  * @param {function} next - next middleware callback.
@@ -52,6 +52,25 @@ exports.dealerWishList = function (req, res, next) {
 
 exports.dealerWins = function (req, res, next) {
     wishListModel.dealerWins(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
+/**
+ * Show seller closed deals
+ * @request_type- POST
+ * @url- /secure/auction/seller/closed
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.sellerClosedDeals = function (req, res, next) {
+    wishListModel.sellerClosedDeals(req, (err, result) => {
         if (err) {
             return next(err);
         } else {
