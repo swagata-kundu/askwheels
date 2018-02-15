@@ -118,15 +118,15 @@ exports.changeVehicleStatus = function (req, res, next) {
 
 /**
  * Upload behicle for auction
- * @request_type- GET
- * @url- /secure/auction/features
+ * @request_type- POST
+ * @url- /secure/auction/seller/payment
  * @param {Object} req - express request.
  * @param {Object} res - express response.
  * @param {function} next - next middleware callback.
  */
 
-exports.listFeatures = function (req, res, next) {
-    auctionModel.listFeatures(req, (err, result) => {
+exports.getSellerPayment = function (req, res, next) {
+    auctionModel.getSellerPayment(req, (err, result) => {
         if (err) {
             return next(err);
         } else {

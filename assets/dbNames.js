@@ -31,6 +31,7 @@ module.exports = {
         sellerNotification: 'sp_seller_notifications',
         dealerWinCron: 'sp_dealer_win_job',
         dealerWins: 'sp_dealer_wins',
-        sellerClosedDeals: 'sp_seller_closed_deals'
+        sellerClosedDeals: 'sp_seller_closed_deals',
+        sellerPayments:'sp_user_payments'
     }
 };
