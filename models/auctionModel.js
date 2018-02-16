@@ -19,7 +19,7 @@ module.exports = auction;
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-auction.uploadVehicle = function(req, callback) {
+auction.uploadVehicle = function (req, callback) {
     async.waterfall(
         [
             cb => {
@@ -27,7 +27,9 @@ auction.uploadVehicle = function(req, callback) {
             },
             (insertInfo, cb) => {
                 var vehicleId = insertInfo.insertId;
-                let { basic_info } = req.body;
+                let {
+                    basic_info
+                } = req.body;
                 insertVehicleImages(vehicleId, basic_info.images, err => {
                     if (err) {
                         return cb(err);
@@ -63,11 +65,11 @@ auction.uploadVehicle = function(req, callback) {
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-auction.listFeatures = function(req, callback) {
+auction.listFeatures = function (req, callback) {
     var sql = 'CALL ?? ()';
     var parameters = [dbNames.sp.featureList];
     sql = mysql.format(sql, parameters);
-    dbHelper.executeQuery(sql, function(err, result) {
+    dbHelper.executeQuery(sql, function (err, result) {
         if (err) {
             return callback(err);
         }
@@ -154,7 +156,7 @@ auction.listFeatures = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-auction.vehicleListAdmin = function(req, callback) {
+auction.vehicleListAdmin = function (req, callback) {
     var rules = {
         searchText: Check.that(req.body.searchText)
             .isOptional()
@@ -172,7 +174,7 @@ auction.vehicleListAdmin = function(req, callback) {
             .isOptional()
             .isNotEmptyOrBlank()
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
@@ -186,7 +188,7 @@ auction.vehicleListAdmin = function(req, callback) {
             req.body.sortOrder ? req.body.sortOrder : ''
         ];
         sql = mysql.format(sql, parameters);
-        dbHelper.executeQuery(sql, function(err, result) {
+        dbHelper.executeQuery(sql, function (err, result) {
             if (err) {
                 return callback(err);
             }
@@ -205,12 +207,12 @@ auction.vehicleListAdmin = function(req, callback) {
  * @param {object} req -express object,
  * @param {function(Error,object)} callback - callback function.
  */
-auction.changeVehicleStatus = function(req, callback) {
+auction.changeVehicleStatus = function (req, callback) {
     var rules = {
         vehicleId: Check.that(req.body.vehicleId).isInteger(),
         status: Check.that(req.body.status).isInteger()
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
@@ -224,7 +226,7 @@ auction.changeVehicleStatus = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-auction.auctionListSeller = function(req, callback) {
+auction.auctionListSeller = function (req, callback) {
     var sellerId = 0;
     var subsellerId = 0;
 
@@ -303,7 +305,7 @@ auction.auctionListSeller = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-auction.auctionListDealer = function(req, callback) {
+auction.auctionListDealer = function (req, callback) {
     async.series(
         [
             cb => {
@@ -370,7 +372,7 @@ auction.auctionListDealer = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-auction.auctionDetail = function(req, callback) {
+auction.auctionDetail = function (req, callback) {
     async.series(
         [
             cb => {
@@ -399,9 +401,9 @@ auction.auctionDetail = function(req, callback) {
             if (dbResult[0].length) {
                 response.data = dbResult[0][0];
                 response.data.inspection_report = JSON.parse(
-                    dbResult[0][0].inspection_report
-                        ? dbResult[0][0].inspection_report
-                        : ''
+                    dbResult[0][0].inspection_report ?
+                    dbResult[0][0].inspection_report :
+                    ''
                 );
                 const images = dbResult[1].map(image => image.url);
                 response.data.images = images;
@@ -418,7 +420,7 @@ auction.auctionDetail = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-auction.getSellerPayment = function(req, callback) {
+auction.getSellerPayment = function (req, callback) {
     var sellerId = 0;
     var subsellerId = 0;
     var isAdmin = false;
@@ -448,13 +450,22 @@ auction.getSellerPayment = function(req, callback) {
                 appUtils.validateChecks(rules, cb);
             },
             cb => {
+                const {
+                    startDate,
+                    endDate,
+                    subSellers
+                } = req.body;
+
                 var pageInfo = pagingHelper.makePageObject(req.body);
-                var sql = 'CALL ?? ( ?,?,?,?,?)';
+                var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?)';
                 var parameters = [
                     dbNames.sp.sellerPayments,
                     sellerId,
                     subsellerId,
                     isAdmin,
+                    subSellers && subSellers.length ? subSellers.toString() : '',
+                    startDate ? startDate : null,
+                    endDate ? endDate : null,
                     pageInfo.skip,
                     pageInfo.limit
                 ];
@@ -481,15 +492,20 @@ auction.getSellerPayment = function(req, callback) {
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-var insertVehicle = function(req, callback) {
+var insertVehicle = function (req, callback) {
     var insertObject = {};
 
-    const { basic_info, inspection_report } = req.body;
+    const {
+        basic_info,
+        inspection_report
+    } = req.body;
 
     var omitKeys = ['images'];
 
     try {
-        let { insurance_policy } = basic_info;
+        let {
+            insurance_policy
+        } = basic_info;
         let basic_info_1 = lodash.omit(basic_info, ['insurance_policy']);
         insertObject = lodash.assign({}, basic_info_1, insurance_policy);
 
@@ -521,7 +537,7 @@ var insertVehicle = function(req, callback) {
  * @param {char}  -urls(char).
  * @param {function(Error,object)} callback - callback function.
  */
-var insertVehicleImages = function(vehicleId, urls, callback) {
+var insertVehicleImages = function (vehicleId, urls, callback) {
     if (!urls || urls.length == 0) {
         return callback(null);
     }
@@ -535,8 +551,12 @@ var insertVehicleImages = function(vehicleId, urls, callback) {
     dbHelper.executeQuery(stringQuery, callback);
 };
 
-var changeVehicleStatusFlag = function(vehicleobject, callback) {
-    let { vehicleId, status, reason } = vehicleobject;
+var changeVehicleStatusFlag = function (vehicleobject, callback) {
+    let {
+        vehicleId,
+        status,
+        reason
+    } = vehicleobject;
     var insertObject = {};
     insertObject.vehicle_status = status;
     if (status == 2) {

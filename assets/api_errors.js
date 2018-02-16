@@ -20,8 +20,7 @@ module.exports = {
 
     user_disabled: {
         error_code: 'USER_DISABLED',
-        description:
-      'User account has been disabled. API use or login is not allowed.'
+        description: 'User account has been disabled. API use or login is not allowed.'
     },
 
     already_registered: {
@@ -31,14 +30,12 @@ module.exports = {
 
     invalid_operation: {
         error_code: 'INVALID_OPERATION',
-        description:
-      'The requested operation is not allowed due to logical or business rules. Cannot proceed.'
+        description: 'The requested operation is not allowed due to logical or business rules. Cannot proceed.'
     },
 
     no_resource_access: {
         error_code: 'NO_RESOURCE_ACCESS',
-        description:
-      'User does not have required level of access to the requested resource.'
+        description: 'User does not have required level of access to the requested resource.'
     },
     file_type_not_allowed: {
         error_code: 'INVALID_FILE_TYPE',

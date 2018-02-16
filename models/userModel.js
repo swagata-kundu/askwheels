@@ -31,7 +31,7 @@ var _user_role = {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.createPublicUser = function(req, callback) {
+user.createPublicUser = function (req, callback) {
     var rules = {
         firstName: Check.that(req.body.firstName)
             .isNotEmptyOrBlank()
@@ -66,13 +66,13 @@ user.createPublicUser = function(req, callback) {
             .isNotEmptyOrBlank()
             .isLengthInRange(10, 20);
     }
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         } else {
             var insertData = sanitizeDataForUserTable(req.body, linkId);
             var sessionId = insertData.sessionId;
-            insertUserData(insertData, req.body.roleId, function(err, userIdCreated) {
+            insertUserData(insertData, req.body.roleId, function (err, userIdCreated) {
                 if (err) {
                     return callback(err);
                 }
@@ -105,12 +105,12 @@ user.createPublicUser = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.changePassword = function(req, callback) {
+user.changePassword = function (req, callback) {
     if (!req.body.userId) {
         changeUsersOwnPassword(req, callback);
     } else if (
         req.body.userId &&
-    (req.auth.roleId === 1 || req.auth.roleId === 4)
+        (req.auth.roleId === 1 || req.auth.roleId === 4)
     ) {
         changeOtherUserPassword(req, callback);
     } else {
@@ -124,7 +124,7 @@ user.changePassword = function(req, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-user.editProfile = function(req, callback) {
+user.editProfile = function (req, callback) {
     if (!req.body.userId) {
         updateUserOwnProfile(req.body, req.auth.id, callback);
     } else if (req.body.userId && req.auth.roleId === 4) {
@@ -141,27 +141,27 @@ user.editProfile = function(req, callback) {
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-user.blockUser = function(req, callback) {
+user.blockUser = function (req, callback) {
     var rules = {
         userId: Check.that(req.body.userId).isMYSQLId(),
         flag: Check.that(req.body.flag).isBooleanType()
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
         var SQL = 'CALL ?? (?,?)';
         var inserts = [dbNames.sp.blockUser, req.body.userId, req.body.flag];
         SQL = mysql.format(SQL, inserts);
-        dbHelper.executeQuery(SQL, function(err, result) {
+        dbHelper.executeQuery(SQL, function (err, result) {
             if (err) {
                 return callback(err);
             }
             if (result.affectedRows == 1) {
                 var resopnse = new responseModel.objectResponse();
-                resopnse.message = req.body.flag
-                    ? responseMessage.USER_BLOCKED
-                    : responseMessage.USER_UNBLOCKED;
+                resopnse.message = req.body.flag ?
+                    responseMessage.USER_BLOCKED :
+                    responseMessage.USER_UNBLOCKED;
                 return callback(err, resopnse);
             }
             return callback(
@@ -177,16 +177,16 @@ user.blockUser = function(req, callback) {
  * Remove redundent data in case of failed sign up
  * @param {int} - userId (newly created userId)
  */
-user.failedSignUp = function(userId) {
+user.failedSignUp = function (userId) {
     if (userId) {
         var SQL = 'CALL ?? (?)';
         var inserts = [dbNames.sp.failedSignUp, userId];
         SQL = mysql.format(SQL, inserts);
-        dbHelper.executeQuery(SQL, function() {});
+        dbHelper.executeQuery(SQL, function () {});
     }
 };
 
-var addUserRole = function(userId, roleId, callback) {
+var addUserRole = function (userId, roleId, callback) {
     var stringQuery = 'INSERT INTO db_user_in_roles SET ?';
     var insertData = {
         roleId: roleId,
@@ -203,8 +203,8 @@ var addUserRole = function(userId, roleId, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-var insertUserData = function(insertData, roleId, callback) {
-    checkDuplicateRegistratrtion(insertData.email, insertData.phone, function(
+var insertUserData = function (insertData, roleId, callback) {
+    checkDuplicateRegistratrtion(insertData.email, insertData.phone, function (
         err,
         status
     ) {
@@ -216,17 +216,17 @@ var insertUserData = function(insertData, roleId, callback) {
                 ApiException.newNotAllowedError(
                     api_errors.already_registered.error_code,
                     null
-                ).addDetails(api_errors.already_registered.description)
+                ).addDetails(roleId === 2 ? 'User with this number already exist' : api_errors.already_registered.description)
             );
         }
         var stringQuery = 'INSERT INTO db_users SET ? ';
         stringQuery = mysql.format(stringQuery, insertData);
-        dbHelper.executeQuery(stringQuery, function(err, result) {
+        dbHelper.executeQuery(stringQuery, function (err, result) {
             if (err) {
                 return callback(err);
             }
             var userId = result.insertId;
-            addUserRole(result.insertId, roleId, function(err) {
+            addUserRole(result.insertId, roleId, function (err) {
                 if (err) {
                     return callback(err);
                 }
@@ -240,12 +240,12 @@ var insertUserData = function(insertData, roleId, callback) {
  * Create insert object according to table column name from request body
  * @param {object} data
  */
-var sanitizeDataForUserTable = function(data, linkId) {
+var sanitizeDataForUserTable = function (data, linkId) {
     var insertObject = {};
     insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
-    insertObject['lastName'] = data.lastName
-        ? lodash.capitalize(data.lastName.trim())
-        : '';
+    insertObject['lastName'] = data.lastName ?
+        lodash.capitalize(data.lastName.trim()) :
+        '';
     insertObject['email'] = data.email ? data.email.trim() : '';
     if (data.contactNo) {
         insertObject['phone'] = data.contactNo.trim();
@@ -269,7 +269,7 @@ var sanitizeDataForUserTable = function(data, linkId) {
  * @param {string} emailId
  * @param {function(Error,object)} callback - callback function
  */
-var checkDuplicateRegistratrtion = function(emailId, contactNo, callback) {
+var checkDuplicateRegistratrtion = function (emailId, contactNo, callback) {
     var sql = 'CALL ?? ( ?,?);';
     var object = [
         dbNames.sp.checkDuplicateRegistration,
@@ -277,7 +277,7 @@ var checkDuplicateRegistratrtion = function(emailId, contactNo, callback) {
         contactNo ? contactNo : ''
     ];
     sql = mysql.format(sql, object);
-    dbHelper.executeQuery(sql, function(err, result) {
+    dbHelper.executeQuery(sql, function (err, result) {
         if (err) {
             return callback(err);
         }
@@ -296,7 +296,7 @@ var checkDuplicateRegistratrtion = function(emailId, contactNo, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-var changeUsersOwnPassword = function(req, callback) {
+var changeUsersOwnPassword = function (req, callback) {
     var userId = req.auth.id;
     var rules = {
         newPassword: Check.that(req.body.newPassword)
@@ -306,7 +306,7 @@ var changeUsersOwnPassword = function(req, callback) {
             .isNotEmptyOrBlank()
             .isLengthInRange(4, 20)
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
@@ -325,7 +325,7 @@ var changeUsersOwnPassword = function(req, callback) {
         sqlQuery = mysql.format(sqlQuery, inserts);
 
         dbHelper.executeQueryPromise(sqlQuery).then(
-            function(result) {
+            function (result) {
                 if (result.affectedRows == 1) {
                     var response = new responseModel.objectResponse();
                     response.message = responseMessage.CHANGE_PASSWORD;
@@ -338,7 +338,7 @@ var changeUsersOwnPassword = function(req, callback) {
                     ).addDetails(api_errors.wrong_oldpassword.description)
                 );
             },
-            function(error) {
+            function (error) {
                 return callback(error);
             }
         );
@@ -351,7 +351,7 @@ var changeUsersOwnPassword = function(req, callback) {
  * @param userId(int)- used for changing profile
  * @param {function(Error,object)} callback - callback function.
  */
-var updateUserOwnProfile = function(data, userId, callback) {
+var updateUserOwnProfile = function (data, userId, callback) {
     var insertObject = {};
     if (data.firstName) {
         insertObject['firstName'] = lodash.capitalize(data.firstName.trim());
@@ -367,7 +367,7 @@ var updateUserOwnProfile = function(data, userId, callback) {
     }
 
     if (data.email || data.contactNo) {
-        checkDuplicateRegistratrtion(data.email, data.contactNo, function(
+        checkDuplicateRegistratrtion(data.email, data.contactNo, function (
             err,
             status
         ) {
@@ -396,13 +396,13 @@ var updateUserOwnProfile = function(data, userId, callback) {
     }
 };
 
-var updateData = function(insertObject, userId, callback) {
+var updateData = function (insertObject, userId, callback) {
     if (!lodash.isEmpty(insertObject)) {
         var stringQuery = 'UPDATE ?? SET ? WHERE ??=? AND ??=?';
         var inserts = ['db_users', insertObject, 'id', userId, 'isDeleted', false];
         stringQuery = mysql.format(stringQuery, inserts);
         dbHelper.executeQueryPromise(stringQuery).then(
-            function(result) {
+            function (result) {
                 if (result.affectedRows == 1) {
                     var response = new responseModel.objectResponse();
                     response.message = responseMessage.PROFILE_UPDATED;
@@ -417,7 +417,7 @@ var updateData = function(insertObject, userId, callback) {
                     )
                 );
             },
-            function(error) {
+            function (error) {
                 return callback(error);
             }
         );
@@ -430,7 +430,7 @@ var updateData = function(insertObject, userId, callback) {
  * For sending response if user successfully logged in.
  * @param {Object}  - userDetail(object).
  */
-var responseForSuccessfulSignUp = function(userDetail, userId, roleId) {
+var responseForSuccessfulSignUp = function (userDetail, userId, roleId) {
     var response = {
         firstName: userDetail.firstName,
         lastName: userDetail.lastName,
@@ -451,14 +451,14 @@ var responseForSuccessfulSignUp = function(userDetail, userId, roleId) {
  * @param {function(Error,object)} callback - callback function.
  */
 
-var changeOtherUserPassword = function(req, callback) {
+var changeOtherUserPassword = function (req, callback) {
     var rules = {
         newPassword: Check.that(req.body.newPassword)
             .isNotEmptyOrBlank()
             .isLengthInRange(4, 20),
         userId: Check.that(req.body.userId).isInteger()
     };
-    appUtils.validateChecks(rules, function(err) {
+    appUtils.validateChecks(rules, function (err) {
         if (err) {
             return callback(err);
         }
@@ -476,7 +476,7 @@ var changeOtherUserPassword = function(req, callback) {
         sqlQuery = mysql.format(sqlQuery, inserts);
 
         dbHelper.executeQueryPromise(sqlQuery).then(
-            function(result) {
+            function (result) {
                 if (result.affectedRows == 1) {
                     var response = new responseModel.objectResponse();
                     response.message = responseMessage.CHANGE_PASSWORD;
@@ -489,7 +489,7 @@ var changeOtherUserPassword = function(req, callback) {
                     ).addDetails(api_errors.wrong_oldpassword.description)
                 );
             },
-            function(error) {
+            function (error) {
                 return callback(error);
             }
         );
