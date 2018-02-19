@@ -33,10 +33,11 @@ notification.getDealerNotifications = (req, done) => {
             },
             cb => {
                 var pageInfo = pagingHelper.makePageObject(req.body);
-                var sql = 'CALL ?? ( ?,?,?)';
+                var sql = 'CALL ?? ( ?,?,?,?)';
                 var parameters = [
                     dbNames.sp.dealerNotification,
                     req.auth.id,
+                    req.body.markRead ? true : null,
                     pageInfo.skip,
                     pageInfo.limit
                 ];
@@ -53,6 +54,7 @@ notification.getDealerNotifications = (req, done) => {
             if (dbResult[1].length) {
                 response.data = dbResult[1];
                 response.count = dbResult[0][0].totalRecords;
+                response.unreadCount = dbResult[2][0].unreadCount;
             }
             return done(null, response);
         }
@@ -93,11 +95,12 @@ notification.getSellerNotifications = (req, done) => {
                 }
 
                 var pageInfo = pagingHelper.makePageObject(req.body);
-                var sql = 'CALL ?? ( ?,?,?,?)';
+                var sql = 'CALL ?? ( ?,?,?,?,?)';
                 var parameters = [
                     dbNames.sp.sellerNotification,
                     sellerId ? sellerId : 0,
                     subsellerId ? subsellerId : 0,
+                    req.body.markRead ? true : null,
                     pageInfo.skip,
                     pageInfo.limit
                 ];
@@ -114,6 +117,7 @@ notification.getSellerNotifications = (req, done) => {
             if (dbResult[1].length) {
                 response.data = dbResult[1];
                 response.count = dbResult[0][0].totalRecords;
+                response.unreadCount = dbResult[2][0].unreadCount;
             }
             return done(null, response);
         }

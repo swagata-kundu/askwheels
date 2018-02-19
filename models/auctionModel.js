@@ -265,7 +265,7 @@ auction.auctionListSeller = function (req, callback) {
             },
             cb => {
                 var pageInfo = pagingHelper.makePageObject(req.body);
-                var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?,?,?,?)';
+                var sql = 'CALL ?? ( ?,?,?,?,?,?,?,?,?,?,?,?)';
                 var parameters = [
                     dbNames.sp.auctionListSeller,
                     sellerId,
@@ -277,6 +277,7 @@ auction.auctionListSeller = function (req, callback) {
                     req.body.fuel_type ? req.body.fuel_type : '',
                     req.body.owner_type ? req.body.owner_type : -1,
                     req.body.transmission_type ? req.body.transmission_type : '',
+                    req.body.sortBy ? req.body.sortBy : '',
                     pageInfo.skip,
                     pageInfo.limit
                 ];
@@ -343,9 +344,9 @@ auction.auctionListDealer = function (req, callback) {
                     req.body.fuel_type ? req.body.fuel_type : '',
                     req.body.owner_type ? req.body.owner_type : -1,
                     req.body.transmission_type ? req.body.transmission_type : '',
+                    req.body.sortBy ? req.body.sortBy : '',
                     pageInfo.skip,
                     pageInfo.limit,
-                    req.body.sortBy ? req.body.sortBy : ''
                 ];
                 sql = mysql.format(sql, parameters);
                 dbHelper.executeQuery(sql, cb);
