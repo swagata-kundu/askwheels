@@ -19,6 +19,25 @@ exports.uploadVehicle = function (req, res, next) {
     });
 };
 
+/**
+ * Update vehicle
+ * @request_type- PUT
+ * @url- /secure/auction/vehicle/:vehicleId
+ * @param {Object} req - express request.
+ * @param {Object} res - express response.
+ * @param {function} next - next middleware callback.
+ */
+
+exports.updateVehicle = function (req, res, next) {
+    auctionModel.updateVehicle(req, (err, result) => {
+        if (err) {
+            return next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
 
 /**
  * Vehicle list admin

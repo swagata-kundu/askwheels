@@ -23,7 +23,7 @@ auction.uploadVehicle = function (req, callback) {
     async.waterfall(
         [
             cb => {
-                insertVehicle(req, cb);
+                insertVehicle(req, true, cb);
             },
             (insertInfo, cb) => {
                 var vehicleId = insertInfo.insertId;
@@ -58,6 +58,38 @@ auction.uploadVehicle = function (req, callback) {
             return callback(null, response);
         }
     );
+};
+
+/**
+ * Update vehicle
+ * @param {object} - req (express request object)
+ * @param {function(Error,object)} callback - callback function.
+ */
+auction.updateVehicle = (req, callback) => {
+    const {
+        vehicleId
+    } = req.params;
+    async.series([
+        cb => {
+            insertVehicle(req, false, cb);
+        },
+        cb => {
+            deleteExistingImage(vehicleId, cb);
+        },
+        cb => {
+            let {
+                basic_info
+            } = req.body;
+            insertVehicleImages(vehicleId, basic_info.images, cb);
+        }
+    ], err => {
+        if (err) {
+            return callback(err);
+        }
+        var response = new responseModel.objectResponse();
+        response.message = 'Vehicle updated';
+        return callback(null, response);
+    });
 };
 
 /**
@@ -493,8 +525,12 @@ auction.getSellerPayment = function (req, callback) {
  * @param {object} - req (express request object)
  * @param {function(Error,object)} callback - callback function.
  */
-var insertVehicle = function (req, callback) {
+var insertVehicle = function (req, isInsert, callback) {
     var insertObject = {};
+
+    const {
+        vehicleId
+    } = req.params;
 
     const {
         basic_info,
@@ -516,20 +552,31 @@ var insertVehicle = function (req, callback) {
 
         insertObject.inspection_report = JSON.stringify(inspection_report);
 
-        if (req.auth.roleId === 1) {
-            insertObject.sellerId = req.auth.id;
+        if (isInsert) {
+            if (req.auth.roleId === 1) {
+                insertObject.sellerId = req.auth.id;
+            }
+
+            if (req.auth.roleId === 2) {
+                insertObject.subsellerId = req.auth.id;
+            }
+        } else {
+            insertObject.vehicle_status = 1;
         }
 
-        if (req.auth.roleId === 2) {
-            insertObject.subsellerId = req.auth.id;
-        }
     } catch (error) {
         return callback(ApiException.newBadRequestError(error.message));
     }
 
-    var stringQuery = 'INSERT INTO db_vehicle SET ?';
-    stringQuery = mysql.format(stringQuery, insertObject);
-    dbHelper.executeQuery(stringQuery, callback);
+    if (isInsert) {
+        let stringQuery = 'INSERT INTO db_vehicle SET ?';
+        stringQuery = mysql.format(stringQuery, insertObject);
+        dbHelper.executeQuery(stringQuery, callback);
+    } else {
+        let stringQuery = 'UPDATE ?? SET ? WHERE id = ?';
+        stringQuery = mysql.format(stringQuery, ['db_vehicle', insertObject, vehicleId]);
+        dbHelper.executeQuery(stringQuery, callback);
+    }
 };
 
 /**
@@ -595,4 +642,16 @@ var changeVehicleStatusFlag = function (vehicleobject, callback) {
             return callback(null, response);
         }
     );
+};
+
+/**
+ * Delete existing vehicle images
+ */
+var deleteExistingImage = (vehicleId, callback) => {
+    let stringQuery = 'UPDATE ?? SET ? WHERE ??=?;';
+    let inserts = ['db_vehicle_images', {
+        isDeleted: true
+    }, 'vehicleId', vehicleId];
+    stringQuery = mysql.format(stringQuery, inserts);
+    dbHelper.executeQuery(stringQuery, callback);
 };

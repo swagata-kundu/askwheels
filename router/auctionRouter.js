@@ -5,6 +5,7 @@ var authUtils = require('../libs/authUtils');
 
 router.get('/vehicle/:vehicleId', controllerIndex.auction.auctionDetail);
 router.post('/vehicle', controllerIndex.auction.uploadVehicle);
+router.put('/vehicle/:vehicleId', controllerIndex.auction.updateVehicle);
 router.post('/seller/closed', controllerIndex.wishlist.sellerClosedDeals);
 router.post('/seller/payment', controllerIndex.auction.getSellerPayment);
 router.post('/seller', controllerIndex.auction.auctionListSeller);
