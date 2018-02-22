@@ -1,46 +1,40 @@
-var config = require('config');
-var Push = require('../libs/Push');
-var path = require('path');
+const admin = require('firebase-admin');
 
-// define module
-var pushNotifier = {};
-module.exports = pushNotifier;
+const serviceAccount = require('../assets/google-services.json');
 
-// setup push instance
-var push = new Push();
-var gcmConf = config.get('push.gcm');
-
-
-push.initGcm(gcmConf.gcm_key);
-
-
-// set formatter for gcm push
-push.setGcmMessageFormatter(function (msg, data) {
-    var gcm_data = {};
-    gcm_data.message = data.payload;
-    gcm_data.message.aps = {};
-    gcm_data.message.aps.alert = data.message;
-    msg.addData(gcm_data);
-
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://askwheels-f9606.firebaseio.com/'
 });
 
-/**
- * Send a push notification to given push devices. The type of notification is to be conveyed by code,
- * and should be used to specify a corresponding message.
- * The data for the message is in the given payload.
- * @param {array} gcm device - an array of gcm devices.
- * @param {array} apn device - an array of apn devices.
- * @param {object} payload - notification data.
- */
+const sendMessage = ({
+    title,
+    body,
+    deviceId
+}) => {
 
-pushNotifier.sendPush = function (gcm_devices, payload, callback) {
-    var data = {
-        payload: payload,
-        message: payload.message
+    const message = {
+        data: {
+            title,
+            body,
+        },
+        token: deviceId
     };
-    if (gcm_devices.length) {
-        push.sendGcm(gcm_devices, data);
-    }
-    return callback();
+
+    admin.messaging().send(message).then(r => {
+        console.log(r);
+    }).catch(err => {
+        console.log(err);
+    });
+};
+
+const sendListNotification = (list) => {
+    list.forEach(l => {
+        sendMessage(l);
+    });
 
 };
+
+module.exports = {
+    sendListNotification
+}

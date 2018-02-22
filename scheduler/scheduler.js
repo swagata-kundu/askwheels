@@ -7,10 +7,10 @@ var dbNames = require('../assets/dbNames');
 
 var bidWinJob = new CronJob(
     '0 */5 * * * *',
-    function() {
+    function () {
         job();
     },
-    function() {},
+    function () {},
     true /* Start the job right now */
 );
 
@@ -18,40 +18,46 @@ var bidWinJob = new CronJob(
 function job() {
     console.log(`starting job ${new Date()}`);
     async.waterfall([
-        cb=>{
+        cb => {
             var sql = 'CALL ?? ()';
             var parameters = [dbNames.sp.dealerWinCron];
             sql = mysql.format(sql, parameters);
-            dbHelper.executeQuery(sql,cb);
+            dbHelper.executeQuery(sql, cb);
         },
-        (result,cb)=>{
-            let insertObject=[];
-            result[0].forEach(r=>{
-                const {amount,vehicleId,sellerId,subsellerId,upperSeller}=r;
-                const comission=calculateComission(amount);
-                insertObject.push([vehicleId,0,comission.askwheel]);
-                if(subsellerId && upperSeller){
-                    insertObject.push([vehicleId,subsellerId,comission.subseller]);
-                    insertObject.push([vehicleId,upperSeller,comission.seller]);
+        (result, cb) => {
+            let insertObject = [];
+            result[0].forEach(r => {
+                const {
+                    amount,
+                    vehicleId,
+                    sellerId,
+                    subsellerId,
+                    upperSeller
+                } = r;
+                const comission = calculateComission(amount);
+                insertObject.push([vehicleId, 0, comission.askwheel]);
+                if (subsellerId && upperSeller) {
+                    insertObject.push([vehicleId, subsellerId, comission.subseller]);
+                    insertObject.push([vehicleId, upperSeller, comission.seller]);
                 }
-                if(sellerId){
-                    insertObject.push([vehicleId,sellerId,comission.subseller+comission.seller]);
+                if (sellerId) {
+                    insertObject.push([vehicleId, sellerId, comission.subseller + comission.seller]);
                 }
             });
-            if(!insertObject.length){
+            if (!insertObject.length) {
                 return cb(null);
             }
             var stringQuery = 'INSERT INTO db_payment (vehicleId,userId,comission) VALUES ?';
             stringQuery = mysql.format(stringQuery, [insertObject]);
             dbHelper.executeQuery(stringQuery, cb);
         }
-    ],err=>{
-        console.log('job completed',err);
+    ], err => {
+        console.log('job completed', err);
     });
 }
 
 function calculateComission(amount) {
-    
+
     if (amount <= 100000) {
         return {
             seller: 3500,
@@ -87,7 +93,7 @@ function calculateComission(amount) {
             askwheel: 27000
         };
     }
-    return{
+    return {
         seller: 20000,
         subseller: 10000,
         askwheel: 40000

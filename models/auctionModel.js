@@ -6,6 +6,7 @@ var responseMessage = require('../assets/responseMessage');
 var dbNames = require('../assets/dbNames');
 var pagingHelper = require('../helper/paginationHelper');
 var ApiException = require('../libs/core/ApiException');
+// var push = require('../notify/pushNotifier');
 
 var mysql = require('mysql');
 var async = require('async');
@@ -606,12 +607,19 @@ var changeVehicleStatusFlag = function (vehicleobject, callback) {
         reason
     } = vehicleobject;
     var insertObject = {};
+    var statusName = '';
+
+
+
+
     insertObject.vehicle_status = status;
     if (status == 2) {
         insertObject.admin_live_date = new Date();
+        statusName = 'marked live';
     }
     if (status == 3) {
         insertObject.reject_reason = reason;
+        statusName = 'rejected because ' + reason;
     }
     async.series(
         [
@@ -631,6 +639,36 @@ var changeVehicleStatusFlag = function (vehicleobject, callback) {
                 let stringQuery = 'INSERT INTO db_seller_notification SET ?';
                 stringQuery = mysql.format(stringQuery, notificationObject);
                 dbHelper.executeQuery(stringQuery, cb);
+            },
+            cb => {
+                var sql = 'CALL ?? ( ?)';
+                var parameters = [
+                    dbNames.sp.sellerInfoForVehicle,
+                    vehicleId
+                ];
+                sql = mysql.format(sql, parameters);
+                dbHelper.executeQuery(sql, (err, result) => {
+                    if (err) {
+                        return cb(err);
+                    }
+                    let users = [];
+
+                    result[0].forEach(r => {
+                        if (r.deviceId) {
+                            users.push({
+                                deviceId: r.deviceId,
+                                title: 'Auction Changed',
+                                body: `Vehicle ${r.vehicle_name} has been ${statusName} by Askwheels.`
+                            });
+                        }
+                    });
+
+                    if (users.length > 0) {
+                        // push.sendListNotification(users);
+                    }
+
+                    return cb(null);
+                });
             }
         ],
         err => {

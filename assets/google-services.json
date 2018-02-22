@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "554761611868",
+    "firebase_url": "https://askwheels-f9606.firebaseio.com",
+    "project_id": "askwheels-f9606",
+    "storage_bucket": "askwheels-f9606.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:554761611868:android:29473502753423dd",
+        "android_client_info": {
+          "package_name": "com.aexyn.askwheels"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "554761611868-7v07u0a5pnj2ng2oaaqkqi4hr8rv9col.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-QTiRrfF1inZ0GTYaTjv-AgTSJp2h8SE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

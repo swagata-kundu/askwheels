@@ -22,12 +22,5 @@
         "tls": {
             "rejectUnauthorized": false
         }
-    },
-    "aws": {
-        "key": {
-            "accessKeyId": "AKIAIL3ZPXXKMF7NP3JA",
-            "secretAccessKey": "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",
-            "region": "us-east-1"
-        }
     }
 }

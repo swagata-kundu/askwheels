@@ -20,7 +20,13 @@ module.exports = bidding;
  */
 
 bidding.submitBid = (req, callback) => {
-    let { id, biddingLimit } = req.auth;
+    let {
+        id,
+        biddingLimit,
+        firstName
+    } = req.auth;
+    let vehicleName = '';
+
     async.series(
         [
             cb => {
@@ -47,10 +53,15 @@ bidding.submitBid = (req, callback) => {
                         auction_start_date,
                         start_bid,
                         max_bid,
-                        dealer_total_bid
+                        dealer_total_bid,
+                        vehicle_name
                     } = result[0][0];
 
-                    let { amount } = req.body;
+                    vehicleName = vehicle_name;
+
+                    let {
+                        amount
+                    } = req.body;
 
                     let lastBidTime = moment(
                         auction_start_date,
@@ -108,7 +119,25 @@ bidding.submitBid = (req, callback) => {
                     req.body.amount
                 ];
                 sql = mysql.format(sql, parameters);
-                dbHelper.executeQuery(sql, cb);
+                dbHelper.executeQuery(sql, (err, result) => {
+                    if (err) {
+                        return cb(err);
+                    }
+                    let users = [];
+                    result[0].forEach(r => {
+                        if (r.deviceId) {
+                            users.push({
+                                deviceId: r.deviceId,
+                                title: 'New Bid Added',
+                                body: `New bid of amount ${ req.body.amount}  has been submitted on ${vehicleName} by ${firstName}.`
+                            });
+                        }
+                    });
+
+                    if (users.length > 0) {}
+
+                    return cb(null);
+                });
             }
         ],
         err => {
