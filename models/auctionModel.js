@@ -6,7 +6,7 @@ var responseMessage = require('../assets/responseMessage');
 var dbNames = require('../assets/dbNames');
 var pagingHelper = require('../helper/paginationHelper');
 var ApiException = require('../libs/core/ApiException');
-// var push = require('../notify/pushNotifier');
+var push = require('../notify/pushNotifier');
 
 var mysql = require('mysql');
 var async = require('async');
@@ -212,9 +212,11 @@ auction.vehicleListAdmin = function (req, callback) {
             return callback(err);
         }
         var pageInfo = pagingHelper.makePageObject(req.body);
-        var sql = 'CALL ?? ( ?,?,?,?)';
+        var sql = 'CALL ?? ( ?,?,?,?,?,?)';
         var parameters = [
             dbNames.sp.vehicleListAdmin,
+            req.body.sellerId?req.body.sellerId:0,
+            req.body.subSellerId?req.body.subSellerId:0,
             pageInfo.skip,
             pageInfo.limit,
             req.body.sortBy ? req.body.sortBy : '',
@@ -655,6 +657,7 @@ var changeVehicleStatusFlag = function (vehicleobject, callback) {
 
                     result[0].forEach(r => {
                         if (r.deviceId) {
+                            console.log(r);
                             users.push({
                                 deviceId: r.deviceId,
                                 title: 'Auction Changed',
@@ -664,7 +667,7 @@ var changeVehicleStatusFlag = function (vehicleobject, callback) {
                     });
 
                     if (users.length > 0) {
-                        // push.sendListNotification(users);
+                        push.sendListNotification(users);
                     }
 
                     return cb(null);
