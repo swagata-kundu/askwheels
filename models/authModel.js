@@ -159,7 +159,7 @@ var validateUser = function (request, callback) {
                 if(isLive){
                     return callback(null, result[0][0]);
                 }else{
-                    return callback(ApiException.newNotAllowedError(api_errors.invalid_auth_credentials.error_code, null).addDetails('Your account in not active. Contact admin for account activition'));
+                    return callback(ApiException.newNotAllowedError(api_errors.account_disabled.error_code, null).addDetails(api_errors.account_disabled.description));
                 }
             } else {
                 return callback(ApiException.newNotAllowedError(api_errors.invalid_auth_credentials.error_code, null).addDetails(api_errors.invalid_auth_credentials.description));

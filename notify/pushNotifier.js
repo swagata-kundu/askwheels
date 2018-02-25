@@ -15,7 +15,7 @@ const sendMessage = ({
 
     const message = {
         data: {
-            aw_notification_message:  body,
+            aw_notifcation_message:  body,
         },
         token: deviceId
     };

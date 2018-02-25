@@ -17,7 +17,10 @@ module.exports = {
         error_code: 'INVALID_AUTH_CRED',
         description: 'Authorization credentials are invalid'
     },
-
+    account_disabled: {
+        error_code: 'ACCOUNT_NOT_ACTIVE',
+        description: 'Your account is not active. Please contact with admin'
+    },
     user_disabled: {
         error_code: 'USER_DISABLED',
         description: 'User account has been disabled. API use or login is not allowed.'
