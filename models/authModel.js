@@ -155,7 +155,12 @@ var validateUser = function (request, callback) {
         .executeQueryPromise(sql)
         .then(function (result) {
             if (result[0].length) {
-                return callback(null, result[0][0]);
+                const {isLive}=result[0][0];
+                if(isLive){
+                    return callback(null, result[0][0]);
+                }else{
+                    return callback(ApiException.newNotAllowedError(api_errors.account_disabled.error_code, null).addDetails(api_errors.account_disabled.description));
+                }
             } else {
                 return callback(ApiException.newNotAllowedError(api_errors.invalid_auth_credentials.error_code, null).addDetails(api_errors.invalid_auth_credentials.description));
             }

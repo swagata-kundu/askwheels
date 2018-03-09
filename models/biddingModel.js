@@ -6,6 +6,7 @@ var dbNames = require('../assets/dbNames');
 var pagingHelper = require('../helper/paginationHelper');
 var ApiException = require('../libs/core/ApiException');
 var api_errors = require('../assets/api_errors');
+var push = require('../notify/pushNotifier');
 
 const mysql = require('mysql');
 const async = require('async');
@@ -134,7 +135,9 @@ bidding.submitBid = (req, callback) => {
                         }
                     });
 
-                    if (users.length > 0) {}
+                    if (users.length > 0) {
+                        push.sendListNotification(users);
+                    }
 
                     return cb(null);
                 });

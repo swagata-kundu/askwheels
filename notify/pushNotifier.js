@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 
-const serviceAccount = require('../assets/google-services.json');
+const serviceAccount = require('../assets/admin-sdk.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -15,8 +15,7 @@ const sendMessage = ({
 
     const message = {
         data: {
-            title,
-            body,
+            aw_notifcation_message:  body,
         },
         token: deviceId
     };
@@ -37,4 +36,4 @@ const sendListNotification = (list) => {
 
 module.exports = {
     sendListNotification
-}
+};
