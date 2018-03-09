@@ -171,23 +171,36 @@ var validateUser = function (request, callback) {
  * @param {function(Error,object)} callback - callback function.
  */
 var updateUserDetailOnLogin = function (body, userId, callback) {
-    var updateObject = {};
 
     if (!body.deviceId) {
         return callback(null);
     }
-    updateObject['deviceId'] = body.deviceId;
 
-    var stringQuery = 'UPDATE ?? SET ? WHERE id = ?';
-    stringQuery = mysql.format(stringQuery, ['db_users', updateObject, userId]);
-    dbHelper
-        .executeQueryPromise(stringQuery)
-        .then(function (result) {
-            callback(null, result);
-        }, function (err) {
-            callback(err, null);
-        });
+    async.series([
+        cb => {
+            var sql = 'CALL ?? ( ?)';
+            var parameters = [
+                dbNames.sp.removeDeviceId,
+                body.deviceId
+            ];
+            sql = mysql.format(sql, parameters);
+            dbHelper.executeQuery(sql, cb);
+        },
+        cb => {
+            var updateObject = {};
+            updateObject['deviceId'] = body.deviceId;
 
+            var stringQuery = 'UPDATE ?? SET ? WHERE id = ?';
+            stringQuery = mysql.format(stringQuery, ['db_users', updateObject, userId]);
+            dbHelper
+                .executeQueryPromise(stringQuery)
+                .then(function (result) {
+                    cb(null, result);
+                }, function (err) {
+                    cb(err, null);
+                });
+        }
+    ], callback);
 };
 
 /**

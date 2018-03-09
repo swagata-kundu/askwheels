@@ -33,6 +33,7 @@ module.exports = {
         dealerWins: 'sp_dealer_wins',
         sellerClosedDeals: 'sp_seller_closed_deals',
         sellerPayments: 'sp_user_payments',
-        sellerInfoForVehicle: 'sp_get_seller_info'
+        sellerInfoForVehicle: 'sp_get_seller_info',
+        removeDeviceId: 'sp_remove_deviceId'
     }
 };

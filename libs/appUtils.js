@@ -15,11 +15,11 @@ module.exports = appUtils;
  */
 appUtils.validateChecks = function (rules, next) {
 
-    if(!lodash.isPlainObject(rules)){
+    if (!lodash.isPlainObject(rules)) {
         throw new Error('rules should be a plain object');
     }
 
-    if(!lodash.isFunction(next)){
+    if (!lodash.isFunction(next)) {
         throw new Error('next should be a function');
     }
 
@@ -28,7 +28,7 @@ appUtils.validateChecks = function (rules, next) {
     if (errors.length > 0) {
         return next(ApiException.newBadRequestError(null).addDetails(errors));
     } else {
-        next();
+        return next();
     }
 };
 
@@ -101,9 +101,9 @@ appUtils.ensureId = function (id) {
  * @param {Number} skip - skip value.
  * @return {Number}
  */
-appUtils.ensureSkip = function(skip){
+appUtils.ensureSkip = function (skip) {
     skip = parseInt(skip);
-    return lodash.isFinite(skip) ? Math.max(0,skip) : 0;
+    return lodash.isFinite(skip) ? Math.max(0, skip) : 0;
 };
 
 /**
@@ -111,7 +111,7 @@ appUtils.ensureSkip = function(skip){
  * @param {Number} limit - limit value.
  * @return {Number}
  */
-appUtils.ensureLimit = function(limit){
+appUtils.ensureLimit = function (limit) {
     limit = parseInt(limit);
-    return lodash.isFinite(limit) ? Math.min(appUtils.MAX_PAGE_LIMIT,Math.max(1,limit)) : appUtils.MAX_PAGE_LIMIT;
+    return lodash.isFinite(limit) ? Math.min(appUtils.MAX_PAGE_LIMIT, Math.max(1, limit)) : appUtils.MAX_PAGE_LIMIT;
 };
