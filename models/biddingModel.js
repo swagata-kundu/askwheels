@@ -130,7 +130,7 @@ bidding.submitBid = (req, callback) => {
                             users.push({
                                 deviceId: r.deviceId,
                                 title: 'New Bid Added',
-                                body: `New bid of amount ${ req.body.amount}  has been submitted on ${vehicleName} by ${firstName}.`
+                                body: `New bid of amount ${ req.body.amount}  has been submitted on ${vehicleName}`
                             });
                         }
                     });
@@ -148,7 +148,7 @@ bidding.submitBid = (req, callback) => {
                 return callback(err);
             }
             var response = new responseModel.objectResponse();
-            response.message = 'Bid submitted';
+            response.message = 'Your bidding has been submitted successfully';
 
             return callback(null, response);
         }
