@@ -215,8 +215,8 @@ auction.vehicleListAdmin = function (req, callback) {
         var sql = 'CALL ?? ( ?,?,?,?,?,?)';
         var parameters = [
             dbNames.sp.vehicleListAdmin,
-            req.body.sellerId?req.body.sellerId:0,
-            req.body.subSellerId?req.body.subSellerId:0,
+            req.body.sellerId ? req.body.sellerId : 0,
+            req.body.subSellerId ? req.body.subSellerId : 0,
             pageInfo.skip,
             pageInfo.limit,
             req.body.sortBy ? req.body.sortBy : '',
@@ -438,8 +438,8 @@ auction.auctionDetail = function (req, callback) {
                 response.data = dbResult[0][0];
                 response.data.inspection_report = JSON.parse(
                     dbResult[0][0].inspection_report ?
-                    dbResult[0][0].inspection_report :
-                    ''
+                        dbResult[0][0].inspection_report :
+                        ''
                 );
                 const images = dbResult[1].map(image => image.url);
                 response.data.images = images;
@@ -546,6 +546,7 @@ var insertVehicle = function (req, isInsert, callback) {
         let {
             insurance_policy
         } = basic_info;
+        insurance_policy.insurance_validation = insurance_policy.insurance_validation ? insurance_policy.insurance_validation : null;
         let basic_info_1 = lodash.omit(basic_info, ['insurance_policy']);
         insertObject = lodash.assign({}, basic_info_1, insurance_policy);
 
@@ -570,7 +571,7 @@ var insertVehicle = function (req, isInsert, callback) {
     } catch (error) {
         return callback(ApiException.newBadRequestError(error.message));
     }
-
+    insertObject.reg_date = insertObject.reg_date ? insertObject.reg_date : null;
     if (isInsert) {
         let stringQuery = 'INSERT INTO db_vehicle SET ?';
         stringQuery = mysql.format(stringQuery, insertObject);
