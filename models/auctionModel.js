@@ -572,6 +572,8 @@ var insertVehicle = function (req, isInsert, callback) {
         return callback(ApiException.newBadRequestError(error.message));
     }
     insertObject.reg_date = insertObject.reg_date ? insertObject.reg_date : null;
+    insertObject.passengers = insertObject.passengers ? insertObject.passengers : null;
+
     if (isInsert) {
         let stringQuery = 'INSERT INTO db_vehicle SET ?';
         stringQuery = mysql.format(stringQuery, insertObject);
