@@ -212,11 +212,12 @@ auction.vehicleListAdmin = function (req, callback) {
             return callback(err);
         }
         var pageInfo = pagingHelper.makePageObject(req.body);
-        var sql = 'CALL ?? ( ?,?,?,?,?,?)';
+        var sql = 'CALL ?? ( ?,?,?,?,?,?,?)';
         var parameters = [
             dbNames.sp.vehicleListAdmin,
             req.body.sellerId ? req.body.sellerId : 0,
             req.body.subSellerId ? req.body.subSellerId : 0,
+            req.body.status ? req.body.status : 0,
             pageInfo.skip,
             pageInfo.limit,
             req.body.sortBy ? req.body.sortBy : '',
@@ -573,7 +574,8 @@ var insertVehicle = function (req, isInsert, callback) {
     }
     insertObject.reg_date = insertObject.reg_date ? insertObject.reg_date : null;
     insertObject.passengers = insertObject.passengers ? insertObject.passengers : null;
-
+    insertObject.dateModified=new Date();
+    
     if (isInsert) {
         let stringQuery = 'INSERT INTO db_vehicle SET ?';
         stringQuery = mysql.format(stringQuery, insertObject);
