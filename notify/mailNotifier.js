@@ -23,7 +23,7 @@ var fromMail = config.get('mailFrom');
 var transporter = nodemailer.createTransport(smtpTransport(config.get('mailCredential')));
 
 //verify transporter
-transporter.verify(function(error) {
+transporter.verify(function (error) {
     if (error) {
         console.log(error);
     } else {
@@ -38,7 +38,7 @@ transporter.use('compile', htmlToText());
 /**
  * Log email send error
  */
-var logMailError = function(err) {
+var logMailError = function (err) {
     if (err) {
         logger.log(ApiException.newInternalError(err.message).addDetails(responseMessage.MAIL_NOT_SENT));
     }
@@ -51,8 +51,8 @@ var forgetPasswordTemplate = transporter.templateSender({
     subject: 'Password Reset',
     html: fs.readFileSync(path.resolve(__dirname, '..', 'assets/templates/forgetpassword.html')).toString()
 }, {
-    from: fromMail
-});
+        from: fromMail
+    });
 
 
 /**
@@ -63,14 +63,14 @@ var signUpMailTemplate = transporter.templateSender({
     subject: 'Welcome Mail',
     html: fs.readFileSync(path.resolve(__dirname, '..', 'assets/templates/signUp.html')).toString()
 }, {
-    from: fromMail
-});
+        from: fromMail
+    });
 
 
 /**
  * Send mail method
  */
-mailer.sendMail = function(code, toEmail, mailContent) {
+mailer.sendMail = function (code, toEmail, mailContent) {
     switch (code) {
         case api_events.forget_password.event_code:
             forgetPasswordTemplate({ to: toEmail }, mailContent, logMailError);
@@ -79,17 +79,4 @@ mailer.sendMail = function(code, toEmail, mailContent) {
             signUpMailTemplate({ to: toEmail }, mailContent, logMailError);
             break;
     }
-};
-
-/**
- * Business owner sign up mail 
- */
-mailer.sendListingSignUpMail = function(toEmail, mailContent, from) {
-    var listingSignUpMailTemplate = transporter.templateSender({
-        subject: 'Welcome Mail',
-        html: fs.readFileSync(path.resolve(__dirname, '..', 'assets/templates/listingSignUp.html')).toString()
-    }, {
-        from: from
-    });
-    listingSignUpMailTemplate({ to: toEmail, replyTo: from.email }, mailContent, logMailError);
 };

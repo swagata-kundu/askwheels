@@ -12,7 +12,7 @@
     "dateStrings": true,
     "multipleStatements": true
   },
-  "mailFrom": "testermundu@gmail.com",
+  "mailFrom": "info@askwheels.com",
   "mailCredential": {
     "service": "gmail",
     "auth": {
