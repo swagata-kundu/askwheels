@@ -16,8 +16,8 @@
     "mailCredential": {
         "service": "gmail",
         "auth": {
-            "user": "mynightout.dev",
-            "pass": "hrhk@1234"
+            "user": "info@askwheels.com",
+            "pass": "ask@1234"
         },
         "tls": {
             "rejectUnauthorized": false
