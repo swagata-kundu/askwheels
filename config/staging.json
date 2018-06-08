@@ -16,8 +16,8 @@
     "mailCredential": {
         "service": "gmail",
         "auth": {
-            "user": "info@askwheels.com",
-            "pass": "ask@1234"
+            "user": "testermundu@gmail.com",
+            "pass": "swagata45"
         },
         "tls": {
             "rejectUnauthorized": false
